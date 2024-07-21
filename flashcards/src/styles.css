@@ -1,0 +1,279 @@
+*{
+    border-color: rgb(238, 238, 238);
+    border-style: solid;
+    border:  0px solid rgb(238, 238, 238) ;
+    background-color: none;
+    color: #001514;
+    font-size: 100%;
+    
+}
+
+
+div:not(#root){
+    height:fit-content;
+    margin: auto;
+    border: none;
+
+}
+
+
+
+button{
+    border: 1px solid rgb(238, 238, 238);
+    background-color: white;
+    border-radius: 15px;
+    color: #8A9CB4;
+    
+}
+button:hover{
+    cursor: pointer;
+}
+
+header{
+    font-family: "Titillium Web", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+    
+}
+
+.main-header{
+    font-size: 5vh;
+    display: block;
+    width: auto;
+    margin: auto;
+    padding: 1vh;
+    text-align: center;
+    font-weight: bold;
+    color: #3C4653;
+    background: #FFFCF7;
+    
+
+}
+div .main-div{
+    display: flex;
+    align-items: center;
+    margin: none;
+    background-color: #D0D3D7;
+}
+
+.main-div--full-screen{
+
+}
+
+
+/*Color options*/
+.darker{
+    background-color: #C2D076
+
+}
+.text{
+    color:#3C4653;
+}
+.text--pink{
+    color: #E952DE;
+}
+
+.text--green{
+
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+
+ .flashcard-container{
+    margin: auto;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 5vh;
+    height: fit-content;
+    display: flex;
+    padding: 2vh;
+    overflow:auto;
+    flex-wrap: wrap;
+    justify-content:center;
+    
+    flex-direction: column;
+    
+}
+.flashcard{
+    font-family: 'Courier New', Courier, monospace;
+    width: 50vw;
+    height: 40vh;
+    display: block;
+    margin:auto;
+    font-size: 2em;
+    align-items: center;
+    justify-content: right;
+    background-color: white;
+    
+    
+    
+    
+}
+.div-arrow-button{
+    display: flex;
+    justify-content: center;
+    width: fit-content;
+    flex-direction: row;
+}
+.flashcard--fullscreen{
+    min-width: 80vw;
+    height: 70vh;
+    display: block;
+    margin:auto;
+    font-size: 4em;
+}
+
+.flashcard__minimize-button{
+    display: block;
+    position:absolute;
+    bottom:20px;
+    right: 20px;
+    margin: none;
+    text-align: center;
+    padding: 0;
+    height: 9vh;
+    width: 9vh;
+    font-size: 9vh;
+    background-color: #E8E8E7;
+    border-width: 0px;
+    -ms-flex-align: center;
+    justify-content: center;
+    text-align: center;
+    vertical-align: middle;
+    color: #001514;
+    
+}
+.flashcard__minimize-button:hover{
+    cursor: pointer;
+    
+}
+
+
+.arrow__button{
+    margin: auto;
+    display: inline-block;
+    margin: auto;
+    width:25vw;
+    height: 3vh;
+    border-radius: 5px;
+    color: #3C4653;
+    align-self:flex-end;
+}
+.arrow__button--fullscreen{
+    margin-top: 10px;
+    margin-left: 5px;
+    min-width: 40vw;
+    display: block;
+    height: auto;
+    font-size: 5em;
+    
+
+}
+
+ .term-list-element{
+    
+    
+    text-align: left;
+    display: flex;
+    
+}
+
+ .term-list-element__h1 {
+    
+    font-stretch: condensed;
+    
+}
+
+.button--square{
+    display: inline;
+    -ms-flex-align: center;
+    justify-content: center;
+    text-align: center;
+    vertical-align: middle;
+    
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: auto;
+    min-height: 7vh;
+    min-width: 7vh;
+    width: 7vh;
+    max-height: 7vh;
+    max-width: 7vh;
+    padding: 0;
+    margin-right:10px;
+    white-space:normal;
+    color: #8A9CB4;
+    font-weight: bolder;
+    font-size: 7vh;
+    line-height: 7vh;
+    
+    
+}
+text{
+    color: #3C4653;
+}
+
+
+
+.flashcard-list-div {
+    width: 100%;
+    margin: 0;
+  }
+.flashcard-list-div-header {
+    padding: 0;
+   
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    border-bottom-width: 5px;
+    
+  }
+.flashcard-list-div__input {
+    margin: 0;
+    height: 3vh;
+    width:100%;
+    vertical-align: middle;
+    border-width: 1px;
+    
+
+    
+}
+
+
+.flashcard-list-div__label {
+    
+    display: block;
+    font-size:2vh;
+    font-stretch: normal;
+    flex-shrink: 0;
+    text-overflow: clip;
+    width: fit-content;
+    height: .25in;
+    margin: auto;
+    white-space: nowrap;
+    
+    
+    
+    
+}
+.flashcard-list-div__div{
+    display: inline-block;
+    margin: 0;
+    padding: 10px;
+    width: 100%;
+}
+
+.flashcard-list-create__submit{
+    width: 100%;
+    display: inline-block;
+    height: .25in;
+    font-size: 100%;
+    
+}
+  
