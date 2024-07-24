@@ -1,47 +1,13 @@
 
 
 import { useState, useEffect } from 'react';
+import useFetch from './useFetch';
 import sanitize from '../functions/sanitize';
 
 
 
 
-export function useTestBackend(front, back) {
-  const [data, setData] = useState(null);
-  useEffect(() => {
-    const callBackendAPI = async () => {
-      try {
-        const response = await fetch("http://localhost:3500/api", {
-          method: 'post',
-          headers: {
 
-            "Content-Type": "application/json"
-          },
-          body: `
-          {
-              "front": "${front}",
-              "back": "${back}"
-              }`
-
-        });
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        const body = await response.json();
-       
-        // setData(body.data);
-      } catch (error) {
-        console.log('err')
-        console.error(error.message);
-      }
-    };
-    callBackendAPI();
-  }, []);
-  return (
-    <p> {data !== null ? data[data.length - 1].front : "null"}</p>);
-
-}
 
 export function useFetchGet(props) {
   const [data, setData] = useState(null)
@@ -79,8 +45,7 @@ export function useCleaning() {
 
 
 export function useUpdate(props) {
-  console.log('attemtping to update')
-  const [data, setData] = useState(null);
+  const [msg, setMsg] = useState(null);
   const [newCard, setNewCard] = useState({
     front: null,
     back: null,
@@ -88,58 +53,51 @@ export function useUpdate(props) {
     oldFront: null,
     oldBack: null
   })
-  const url=  newCard.existing?"/update":"/save"
+  console.log()
+  const url1= props.id?props.id:""
+   const url2 =  newCard.existing?"/update":"/save"
+   const url = "/" + url1 + url2
+
   useEffect(() => {
     
-    if(newCard.existing!== false && newCard.existing === null) {
-      console.log('null')
+    if(props.id === null) {
       console.log(newCard)
-      const callBackendAPI = async () => {
-        try {
-          const response = await fetch(("http://localhost:3500" + url), {
-            method:'get',
-            headers: {
-  
-              "Content-Type": "application/json"
-            }
-          });
-          if (!response.ok) {
-            throw new Error("Cleaning Failed to fetch data");
-          }
-          const body =  await response.json();
-          props.setData(body.data);
-        } catch (error) {
-          console.error(error.message);
-        }
-      };
-      callBackendAPI();
+    } else if(newCard.existing!== false && newCard.existing === null ) {
+      console.log('shusfhauifdisujfiudajsfijiusfjduijsadiufjsui')
+      setMsg('')
     }
     else{
-      console.log('not' + url)
+      // save or update
       const callBackendAPI = async () => {
+
         try {
+          console.log(url)
           const response = await fetch("http://localhost:3500" + url, {
             method: 'post',
             headers: {
 
               "Content-Type": "application/json"
             },
-            body: `
-            {
-                "front": "${newCard.front}",
-                "back": "${newCard.back}"
-                ${newCard.existing?
-                  ',oldFront: ' +newCard.oldFront +
-                  ', oldBack: '+newCard.oldBack+"}":"}"}`
-
-          });
-          if (!response.ok) {
+            body: JSON.stringify({
+              front: sanitize(newCard.front),
+              back: sanitize(newCard.back),
+              oldFront: newCard.oldFront?sanitize(newCard.oldFront):null,
+              oldBack: newCard.oldBack?sanitize(newCard.oldBack):null
+            })}
+          );
+          if(response.status==400) {
+          }
+          else if (!response.ok) {
+            setMsg('error saving')
             throw new Error("Failed to fetch data");
+          } else {
+            setMsg(null)
           }
           const body = await response.json();
+          
           props.setData(body.data)
+          
         } catch (error) {
-          console.log('err')
           console.error(error.message);
         }
       };
@@ -147,29 +105,11 @@ export function useUpdate(props) {
     }
     
   }, [newCard]);
-  return setNewCard;
+  return [setNewCard, msg];
 
 }
 
-export function useFetch(url, props) {
-  const [data, setData] = useState(null)
-  const port = 'http://localhost:3500/'
-  const options = {
-    method: props.method!==undefined?props.method:'get',
-    body:props.body!==undefined?sanitize(props.body):{}
-  }
-  console.log(`${port}${url}`)
-  
-  useEffect(() => {
-    console.log('test')
-    fetch(`${port}${url}`, options)
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data)})
 
-  }, [url])
-  return data;
-}
 
 
 
@@ -199,22 +139,27 @@ export function useFetch(url, props) {
 
 export function useUpdateProperties(props){
   const [state, setState] = useState(props.init)
-  
- // x console.log('applebees' + JSON.stringify(state))
   const [useChange, setChange] = useState({
     key: null,
     val: null
   })
-  const init = props.init;
   useEffect(() => {
   
     const clone = JSON.parse(JSON.stringify(state))
-  //  console.log(useChange.key)
-    clone[useChange.key] = useChange.val
+    if(Array.isArray(useChange) && useChange.length > 0) {
+      useChange.forEach((card) => {
+        clone[card.key] = card.val
+      })
+    } else if(useChange.key !== null && useChange.val !== null) {
+      clone[useChange.key] = useChange.val
+    }
+      
     setState(JSON.parse(JSON.stringify(clone)))
   }, [useChange]
   )
- // console.log(state)
+  useEffect(() => {
+    console.log('test')
+  }, [props.flashcardSet])
   return [state, setChange]
 }
 
@@ -222,7 +167,6 @@ export function useReact() {
 
   const [state, setState] = useState(0)
   useEffect(() => {
-    console.log(state)
     setState(state + 1)
     
   },
@@ -237,32 +181,76 @@ export function useUpdateTest(props) {
 }
 
 export function  useFetchWithReload(url, props) {
-  const [data, setData] = useState(null)
+  const [data, setData] = useState([null, null])
   const port = 'http://localhost:3500/'
   useEffect(() => {
-    fetch(`${port}${url}`, {
-      method: 'get'
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    const callBackendAPI = async () => {
+      
+      if(url) {
+        const response = await fetch(`${port}${url}`, {
+          method: 'get'
+        })
+        if (!response.ok) {
+          console.log('problem')
+          console.log(response)
+          setData([response, 404])
+          return;
+        } else {
+          console.log(response)
+          const jsonResult = await response.json()
+          setData([jsonResult, 200])
+        }
         
-        setData(data)})
+      /*  .then((res) => {
+          
+          if(!res.ok){
+            console.log('not found')
+            
+            
+          }
+        
+            res.json()
 
+            
+        }, (reason) => {
+          console.log("jdf")
+        })
+        .then((data) => {
+          
+            setData(data)
+          }, (reason) => {
+            console.log(reason)
+          })*/
+      }
+    }
+    callBackendAPI()
   }, [url, props.data])
   return data;
 
 }
 
 export function useLoading(props) {
-  const fetchedData = useFetchWithReload("fetch", {data: props.data})
+  console.log('loading')
+  const fetchedData = useFetchWithReload(props.id?props.id:"", {data: props.data})
   useEffect(() => {
-    console.log(props.data)
     console.log(fetchedData)
-
   }
-  ,[fetchedData, props.data])
+  , [fetchedData, props.data, props.id])
   
   return fetchedData;
   
+
+}
+
+export function useFlashcardSetId(props){
+  const [data, setData] = useState(null)
+  const fetchedData = useFetch('sets')
+  useEffect(() => {
+    if(Array.isArray(fetchedData)){
+      props.setData(fetchedData)
+    }
+  }, [fetchedData])
+
+
 }
 export * from './serverHooks'

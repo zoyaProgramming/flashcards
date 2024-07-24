@@ -1,21 +1,30 @@
 *{
     border-color: rgb(238, 238, 238);
     border-style: solid;
-    border:  0px solid rgb(238, 238, 238) ;
+    border:  0px solid rgb(241, 241, 241) ;
     background-color: none;
     color: #001514;
     font-size: 100%;
-    
+    box-sizing: border-box;
 }
 
 
 div:not(#root){
     height:fit-content;
-    margin: auto;
-    border: none;
-
+    width: 100%;
 }
 
+h1{
+    font-size: 18px;
+    font-weight: 600;
+    width: 100%;
+    text-align: center;
+    color:rgb(0, 0, 0);
+}
+h5{
+    font-size: 13px;
+    font-weight:400;
+}
 
 
 button{
@@ -33,15 +42,20 @@ header{
     font-family: "Titillium Web", sans-serif;
   font-weight: 700;
   font-style: normal;
-    
+  width: 100%;
+  box-sizing: border-box;
 }
+
+
 
 .main-header{
     font-size: 5vh;
     display: block;
-    width: auto;
-    margin: auto;
-    padding: 1vh;
+    width: 100%;
+    margin: none;
+    padding:0;
+    padding-left: 0;
+    padding-right: 0;
     text-align: center;
     font-weight: bold;
     color: #3C4653;
@@ -50,10 +64,12 @@ header{
 
 }
 div .main-div{
-    display: flex;
+    display: block;
     align-items: center;
+    justify-content: center;
     margin: none;
-    background-color: #D0D3D7;
+    background-color: #ffffff;
+    border-width: 1px;
 }
 
 .main-div--full-screen{
@@ -85,17 +101,18 @@ div .main-div{
   'opsz' 24
 }
 
- .flashcard-container{
+ .div--flashcard-container{
     margin: auto;
     width: 100%;
     max-width: 100%;
     margin-top: 5vh;
     height: fit-content;
-    display: flex;
+    display: block;
     padding: 2vh;
     overflow:auto;
     flex-wrap: wrap;
     justify-content:center;
+    background-color: #c9d1dd;
     
     flex-direction: column;
     
@@ -118,12 +135,11 @@ div .main-div{
 .div-arrow-button{
     display: flex;
     justify-content: center;
-    width: fit-content;
     flex-direction: row;
 }
 .flashcard--fullscreen{
     min-width: 80vw;
-    height: 70vh;
+    height: 50vh;
     display: block;
     margin:auto;
     font-size: 4em;
@@ -131,7 +147,6 @@ div .main-div{
 
 .flashcard__minimize-button{
     display: block;
-    position:absolute;
     bottom:20px;
     right: 20px;
     margin: none;
@@ -156,9 +171,10 @@ div .main-div{
 
 
 .arrow__button{
-    margin: auto;
+    margin: 0;
+    margin-top: 5px;
     display: inline-block;
-    margin: auto;
+    
     width:25vw;
     height: 3vh;
     border-radius: 5px;
@@ -187,43 +203,160 @@ div .main-div{
  .term-list-element__h1 {
     
     font-stretch: condensed;
+    display: inline-block;
     
 }
 
 .button--square{
-    display: inline;
-    -ms-flex-align: center;
-    justify-content: center;
-    text-align: center;
-    vertical-align: middle;
-    
-    margin-top: 10px;
-    margin-bottom: 10px;
-    margin-left: auto;
+    color: #8A9CB4;
     min-height: 7vh;
     min-width: 7vh;
     width: 7vh;
     max-height: 7vh;
     max-width: 7vh;
-    padding: 0;
-    margin-right:10px;
-    white-space:normal;
-    color: #8A9CB4;
+    white-space:nowrap;
     font-weight: bolder;
     font-size: 7vh;
+    
+    display: block;
+    -ms-flex-align: center;
+    justify-content: center;
+    text-align: center;
+    vertical-align: middle;
     line-height: 7vh;
+    padding:0;
+    
+
+   
+    
     
     
 }
+
+.button--square--align-right{
+    
+    
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: auto;
+    
+    
+    padding: 0;
+    margin-right:10px;
+}
+
+
+
 text{
     color: #3C4653;
 }
+td{
+    background-color: #f6f8fa;
+    font-size: medium;
+}
+th{
+    font-size: large;
+}
+
+table, td, th, tr{
+    padding: 0;
+    width:auto;
+    border-collapse: collapse;
+    
+    
+    
+}
+
+.div--center-overlapping{
+    display:block;
+    position: fixed;
+    justify-content: center;
+    width: fit-content !important;
+    background-color: rgb(235, 189, 231);
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+.button--close{
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    border-radius: 0;
+    background: none;
+    border: none;
+    color:#8b4b79;
+
+    min-height: 4vh;
+    min-width: 4vh;
+    width: 4vh;
+    max-height: 4vh;
+    max-width: 4vh;
+    white-space:nowrap;
+    font-size: 4vh;
+    
+    display: block;
+    -ms-flex-align: center;
+    justify-content: center;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 4vh;
+    padding:0;
+}
+.button--close:hover{
+    color: #701355;
+}
+
+th{
+    width:0;
+}
+
+p{
+    height: 3vh;
+    margin: 0;
+    width: 20vh;
+}
+.h1--list-flashcard-sets{
+    padding: auto;
+    width: 100%;
+    font-size: large;
+    display: inline-block;
+    text-align: center;
+    margin-bottom: 0;
+    color: #310052;
 
 
+}
+.header--list-flashcard-sets{
+    display: block;
+    width: 100% ;
+    
+    
+}
+
+
+table{
+    font-size: 0px;
+    width:100%;
+    align-self: flex-end;
+}
+
+
+.th--for-button{
+    width:7vh;
+    color: red;
+
+}
+.td--nowrap{
+    width:max-content;
+    white-space: nowrap;
+}
 
 .flashcard-list-div {
     width: 100%;
     margin: 0;
+    flex-wrap: wrap;
   }
 .flashcard-list-div-header {
     padding: 0;
@@ -239,7 +372,10 @@ text{
     height: 3vh;
     width:100%;
     vertical-align: middle;
-    border-width: 1px;
+    border-width: 0px;
+    padding: 0;
+
+
     
 
     
@@ -274,6 +410,71 @@ text{
     display: inline-block;
     height: .25in;
     font-size: 100%;
+    align-items: center;
     
 }
+
+.div--top-menu{
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    background-color: #ffffff;
+    border-bottom: 2px solid rgb(204, 208, 208) !important;
+    padding: 0;
+}
+.button--top-menu{
+    font-family: Inter, "system-ui", "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif !important;
+    background-color: #ffffff;
+    accent-color: blue;
+    width:max-content;
+
+padding: 8px;
+padding-bottom:8px;
+    border-width: 0px;
+    border-radius: 4px;
+    line-height: 28px;
+    font-size: 16px;
+}
+.button--top-menu:hover{
+    cursor:default;
+    background-color: #d6e3f1;
+    color: #455083;
+}
   
+
+.table--all-set-list{
+    border: 0px;
+    width: 40vw !important;
+    margin: auto;
+    margin-right: 0;
+    margin: 15px;
+}
+.all-set-list{
+    border: 0px;
+    background: none;
+    white-space: nowrap;
+    
+    
+}
+.table--button{
+   
+    border: 0px;
+    background: none;
+    color: #8b4b79;
+    display: block;
+    text-align: center;
+    border-radius: 2px;
+    width: 100%;
+
+}
+.table--button:hover{
+    background:rgb(232, 170, 227);
+    color: #701355;
+}
+
+.h1--delete-confirmation{
+
+}
+.button--delete-confirmation{
+    
+}
