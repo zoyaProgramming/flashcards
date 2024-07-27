@@ -200,27 +200,6 @@ export function  useFetchWithReload(url, props) {
           const jsonResult = await response.json()
           setData([jsonResult, 200])
         }
-        
-      /*  .then((res) => {
-          
-          if(!res.ok){
-            console.log('not found')
-            
-            
-          }
-        
-            res.json()
-
-            
-        }, (reason) => {
-          console.log("jdf")
-        })
-        .then((data) => {
-          
-            setData(data)
-          }, (reason) => {
-            console.log(reason)
-          })*/
       }
     }
     callBackendAPI()
@@ -232,18 +211,12 @@ export function  useFetchWithReload(url, props) {
 export function useLoading(props) {
   console.log('loading')
   const fetchedData = useFetchWithReload(props.id?props.id:"", {data: props.data})
-  useEffect(() => {
-    console.log(fetchedData)
-  }
-  , [fetchedData, props.data, props.id])
+  
   
   return fetchedData;
-  
-
 }
 
 export function useFlashcardSetId(props){
-  const [data, setData] = useState(null)
   const fetchedData = useFetch('sets')
   useEffect(() => {
     if(Array.isArray(fetchedData)){

@@ -5,12 +5,12 @@ export default function useSets(props) {
   const port = 'http://localhost:3500/'
 
   useEffect(() => {
-    console.log('doing')
-    fetch("http://localhost:3500/sets", {
+    fetch(port + 'listSets', {
       method: 'get',
       headers: {
         'Content-Type': 'application/json'
-      }
+      },
+      credentials: 'include'
     })
       .then((res) => {
         console.log(res)

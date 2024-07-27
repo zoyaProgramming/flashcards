@@ -1,65 +1,106 @@
 import logo from './logo.svg';
-import { useTestBackend, useCleaning, useUpdate, useUpdateProperties, useReact, useUpdateTest, useLoading, useFetch } from './hooks/serverHooks.js';
+import { submitUpdateHandler, fetchHandler, submitAddHandler, deleteHandler, firstReloadHandler} from './functions/serverEventHandlers.js';
+import {useUpdateProperties, useFetchWithReload } from './hooks/serverHooks.js';
 import sanitize from './functions/sanitize.js';
 import './App.css';
-import { useState, useEffect, useContext, createContext } from 'react';
+import { useState, useReducer, useContext, createContext} from 'react';
 import './list.js';
-import useDeleteFunction from './hooks/deleteHook.js';
+import deleteFunction from './hooks/deleteHook.js';
 import CreateHeader from './components/CreateHeader.js';
 import DeleteConfirmation from './components/DeleteConfirmation.js';
+import { dataReducer } from './functions/dataReducer.js';
+import { userReducer } from './functions/userReducer.js';
+import { useDataHook } from './hooks/useDataHook.js';
 const DataContext = createContext(null)
-const TestContext = createContext(null)
+const UserContext = createContext(null)
 let setFunction = null;
 var terms = [{ front: "dog", back: "chien" },
 { front: "i am", back: "je suis" },
 { front: "my name is", back: "je m'appelle" }]
 const [minimizeIcon, maximizeIcon] = [null, null];
+
+function appReducer(state, action) {
+  const clone = JSON.parse(JSON.stringify(state))
+   function help (original, action, val)  {
+    switch(action.type) {
+      case 'isAddCardOpen'://horribly named
+        original.isAddCardOpen = !state.isAddCardOpen
+        break;
+      case 'isFlashcardListOpen':
+        original.isFlashcardListOpen = !original.isFlashcardListOpen;
+        break;
+      case 'currentCard':
+        //console.log(action.currentCard)
+        original.currentCard = action.currentCard
+        break;
+      case 'isFront':
+        let f = state.isFront
+        if(action.isFront === 'front'){
+          f = 'front'
+        } else if(state.isFront === 'front') {
+            f = 'back'
+          } else {
+            f = 'front'
+          }
+        original.isFront = f
+        break;
+      case 'reset':
+        original = ({isAddCardOpen: false,
+        currentCard: 0,
+        isFront: 'front',
+        isFlashcardListOpen: false})
+        break;
+    }
+  }
+
+
+
+  if(Array.isArray(action)) {
+    action.forEach((val) => {
+      help(clone, val)
+    })
+    return clone;
+  } else {
+    console.log('yeahhh')
+     help(clone, action)
+     return clone;
+  }
+  
+  throw Error('Unknown action: ' + action.type)
+}
 //Block Element Modifier
-function FlashcardDeleteButton(props) {
-  /*let deleteFunction = useDeleteFunction({
-    setData: setFunction,
-    front: flashcardSet[props.index].front,
-    back: flashcardSet[props.index].back
-  })*/
-  const currentId = useContext(TestContext)
-  const flashcardData = useContext(DataContext)
-  const [url, setUrl] = useState('')
-  const deleteFnc = useDeleteFunction({
-    url: url,
-    front: flashcardData[props.index].front,
-    back: flashcardData[props.index].back,
-    setData: setFunction
-  })
+function FlashcardDeleteButton({index, dispatchData}) {
+  const flashcardData = useContext(DataContext).data.current_set
+  
   return (
     <button className='button--square'
       onClick={() => {
-        setUrl(currentId + '/delete')
+         deleteHandler(
+          {
+            front: flashcardData[index].front,
+            back: flashcardData[index].back
+          },
+          dispatchData
+        )
       }
       }
     >x</button>
   );
 }
-function FlashcardSetListElement({ setCurrentFlashcardSet, setChange, appProperties, index }) {
-  let flashcardSet = useContext(DataContext)
+function FlashcardSetListElement({ dispatchData, appState, index , dispatch}) {
+  let flashcardSetId = useContext(UserContext)
+  let flashcardSet = useContext(DataContext).data.current_set
   const flashcardVals = (flashcardSet[index] === null) ? { front: "", back: "" } : flashcardSet[index]
   const [showEditInputState, setEditInputState] = useState(false)
   const [newValue, setNewValue] = useState(flashcardVals)
-  function edit() {
+  function addFnc(){//horribly named
     setEditInputState(!showEditInputState)
-  }
-  function updateCurrentCard(event) {
-    setNewValue(event.target.value)
   }
   function updateSet() {
     if (newValue.front !== '' && newValue.back !== '') {
-      setCurrentFlashcardSet(
-        {
-          front: newValue.front,
-          back: newValue.back,
-          existing: true,
-          oldFront: flashcardSet[index].front,
-          oldBack: flashcardSet[index].back
-        }
+      submitUpdateHandler({ newCard: newValue, oldCard: flashcardSet[index], dispatchData: dispatchData}).then(() => {
+      }
+        
       )
     }
     setEditInputState(!showEditInputState)
@@ -69,7 +110,7 @@ function FlashcardSetListElement({ setCurrentFlashcardSet, setChange, appPropert
     <tr>
       <td key={flashcardSet[index].front + "_header"} >
         {!showEditInputState ?
-          <p dangerouslySetInnerHTML={{ __html: flashcardSet[appProperties.currentCard] ? flashcardSet[index].front : 'error: flashcard not found' }}></p>
+          <p dangerouslySetInnerHTML={{ __html: flashcardSet[appState.currentCard] ? flashcardSet[index].front : 'error: flashcard not found' }}></p>
           :
           <CreateInput indexOfValueToChange={index} newFlashcardValues={newValue} setNewFlashcardValues={setNewValue} partToChange={'front'}></CreateInput>
         }
@@ -83,19 +124,22 @@ function FlashcardSetListElement({ setCurrentFlashcardSet, setChange, appPropert
       </td>
       <td className='td--nowrap'>
         <button className={`material-symbols-outlined button--square${showEditInputState ? " flashcard-list-create__submit" : ""}`}
-          onClick={!showEditInputState ? edit : updateSet}>  {!showEditInputState ? 'edit' : 'check_circle'}</button>
+          onClick={!showEditInputState ? addFnc : updateSet}> {!showEditInputState ? 'edit' : 'check_circle'}</button>
       </td>
       <td>
-        <FlashcardDeleteButton key={Math.random} index={index}></FlashcardDeleteButton>
+        <FlashcardDeleteButton key={Math.random} index={index} dispatchData={dispatchData}></FlashcardDeleteButton>
       </td>
     </tr>
   );
 }
-function FlashcardSetListAllCards({ setCurrentFlashcardSet, appProperties, setChange }) {
-  const flashcardSet = useContext(DataContext)
+function FlashcardSetListAllCards({ dispatchData, appState, dispatch}) {
+  const data = useContext(DataContext).data
+  const name = data.set_name
+  const flashcardSet = data.current_set
   return (
     <>
-      <table>
+      <table><tbody>
+        
         <tr>
           <th>
             front:
@@ -110,10 +154,10 @@ function FlashcardSetListAllCards({ setCurrentFlashcardSet, appProperties, setCh
         </tr>
         {flashcardSet.map((flashcard, index) => {
           return (
-            <FlashcardSetListElement key={index + '_le'} flashcard={flashcard} index={index} setCurrentFlashcardSet={setCurrentFlashcardSet} setAppProperties={setChange} appProperties={appProperties} flashcardSet={flashcardSet}></FlashcardSetListElement>
+            <FlashcardSetListElement key={index + '_le'} index={index} dispatchData={dispatchData} dispatch={dispatch} appState={appState}></FlashcardSetListElement>
           );
         })}
-      </table>
+      </tbody></table>
     </>
   );
 }
@@ -126,8 +170,7 @@ function CreateInput({ indexOfValueToChange, newFlashcardValues, setNewFlashcard
   return (
     <input className='flashcard-list-div__input' key={newKey} name="new-flashcard-front" id="new-flashcard-front" onChange=
       {(event) => {
-        //console.log(event.target.value)
-        const sanitized = sanitize(event.target.value ? event.target.value : "")
+        ////console.log(event.target.value)
         setNewFlashcardValues({
           front: partToChangeBool ? event.target.value : newFlashcardValues.front,
           back: !partToChangeBool ? event.target.value : newFlashcardValues.back
@@ -136,12 +179,10 @@ function CreateInput({ indexOfValueToChange, newFlashcardValues, setNewFlashcard
       value={newFlashcardValues[partToChange]}
     ></input>);
 }
-function desanitize(input) {
-  const reg2 = /[&amp&lt;&gt;&quot;&#x27;&#x2f]/
-  const b = input.toString().split()
-}
-function FlashcardSetCreateMenu({ setCurrentFlashcardSet, appProperties, setChange }) {
-  const flashcardSet = useContext(DataContext)
+function FlashcardSetCreateMenu({ dataDispatch, dispatch, appState, }) {
+  const data = useContext(DataContext)
+  const flashcardSet = data.data.current_set
+  const name = data.set_name
   const [newFlashcardValues, setNewFlashcardValues] = useState(
     {
       front: "",
@@ -149,27 +190,27 @@ function FlashcardSetCreateMenu({ setCurrentFlashcardSet, appProperties, setChan
     }
   )
   function addWord() {
-    //console.log('hiiii')
+    ////console.log('hiiii')
     var b = JSON.parse(JSON.stringify(flashcardSet))
-    //console.log('byeee')
-    b[b.length] = {
-      front: newFlashcardValues.front,
-      back: newFlashcardValues.back
-    }
-    setCurrentFlashcardSet(
+    ////console.log('byeee')
+    submitAddHandler({
+      newCard: {front: newFlashcardValues.front, back: newFlashcardValues.back},
+      dataDispatch
+    })
+    /*dispatchData(
       {
         front: newFlashcardValues.front,
         back: newFlashcardValues.back,
         existing: false
       }
-    )
+    )*/
     setNewFlashcardValues({
       front: ''
       , back: ''
     })
   }
   return (
-    appProperties.isEditOpen == true ?
+    appState.isAddCardOpen == true ?
       <>
         <header className="flashcard-list-div-header">
           <div className='flashcard-list-div__div'>
@@ -180,146 +221,55 @@ function FlashcardSetCreateMenu({ setCurrentFlashcardSet, appProperties, setChan
             <label className='flashcard-list-div__label' htmlFor="flashcard-list-div__input">back of flashcard</label>
             <CreateInput partToChange={'back'} indexOfValueToChange={null} newFlashcardValues={newFlashcardValues} setNewFlashcardValues={setNewFlashcardValues} key='flashcarddivcreateback'  ></CreateInput>
           </div>
-          <button className={`material-symbols-outlined   button--square${appProperties.isEditOpen ? " flashcard-list-create__submit" : ""}`}
+          <button className={`material-symbols-outlined   button--square${appState.isAddCardOpen ? " flashcard-list-create__submit" : ""}`}
             onClick={addWord} style={{ margin: 'auto', padding: '0' }}>submit</button>
         </header>
       </> :
       null
   );
 }
-/* <input className='flashcard-list-div__input' name = "new-flashcard-front" id = "new-flashcard-front" onChange=
-       {(event) => {setNewFlashcardValues({
-         front:  event.target.value,
-         back: newFlashcardValues.back
-       })}}
-       ></input>*/
-
-/*function Flashcard(
-  { currentCard, handleClick, nextCard, previousCard, appProperties, setChange }) {
-  const flashcardSet = useContext(DataContext)
+function Flashcard({handleClick, nextCard, previousCard, appState, dispatch, dispatchData }) {
+  const data = useContext(DataContext).data
+  if(data === null || data===undefined){
+  
+    return(<h1>select a set to view flashcards</h1>)
+  } else {
+  }
+  const flashcardSet = data.current_set
+  const name = data.set_name
+  console.log(data)
   const colors = {
     front: { color: '#1B1E22' },
     back: { color: '#1B1E22' }
   }
-  const b = '&#x27';
-  return (flashcardSet !== null && flashcardSet.length ?
-    <div className='flashcard-container'>
-      <button className={
-        `flashcard${!appProperties.isFlashcardListOpen ? "--fullscreen" : ""}`
-      } style={colors[appProperties.isFront]} onClick={handleClick} dangerouslySetInnerHTML={{ __html: flashcardSet[appProperties.currentCard][appProperties.isFront] }}>
-      </button>
-      <div className="div-arrow-button">
-        <button className={`arrow__button${!appProperties.isFlashcardListOpen ? "--fullscreen" : ""} previous-button`} onClick={previousCard}>{'<-'}</button>
-        <button className={`arrow__button${!appProperties.isFlashcardListOpen ? "--fullscreen" : ""} next-button}`} onClick={nextCard}>{'->'}</button>
-      </div>
-      {!appProperties.isFlashcardListOpen ? <button className="material-symbols-outlined flashcard__minimize-button"
-        onClick={() => {
-          setChange({
-            key: "isFlashcardListOpen", val: true
-          })
-        }}>
-        collapse_content
-      </button> :
-        <button className="material-symbols-outlined flashcard__minimize-button" onClick={() => {
-          setChange({
-            key: "isFlashcardListOpen", val: false
-          })
-        }}>
-          open_in_full
-        </button>
-      }
-    </div>
-    : <p>not loaded</p>);
-}*/
-function Flashcard({ currentCard, handleClick, nextCard, previousCard, appProperties, setChange }) {
-  const flashcardSet = useContext(DataContext)
-  const colors = {
-    front: { color: '#1B1E22' },
-    back: { color: '#1B1E22' }
-  }
-  return (flashcardSet !== null && flashcardSet.length ?
-    <div className='div--flashcard-container'>
-      <button className={
-        `flashcard${!appProperties.isFlashcardListOpen ? "--fullscreen" : ""}`
-      } style={colors[appProperties.isFront]} onClick={handleClick} dangerouslySetInnerHTML={{ __html: flashcardSet[appProperties.currentCard][appProperties.isFront] }}>
-      </button>
-      <div className="div-arrow-button">
-        <button className={`arrow__button${!appProperties.isFlashcardListOpen ? "--fullscreen" : ""} previous-button`} onClick={previousCard}>{'<-'}</button>
-        <button className={`arrow__button${!appProperties.isFlashcardListOpen ? "--fullscreen" : ""} next-button}`} onClick={nextCard}>{'->'}</button>
-      </div>
-      {!appProperties.isFlashcardListOpen ? <button className="material-symbols-outlined flashcard__minimize-button"
-        onClick={() => {
-          setChange({
-            key: "isFlashcardListOpen", val: true
-          })
-        }}>
-        collapse_content
-      </button> :
-        <button className="material-symbols-outlined flashcard__minimize-button" onClick={() => {
-          setChange({
-            key: "isFlashcardListOpen", val: false
-          })
-        }}>
-          open_in_full
-        </button>
-      }
-    </div>
-    : <h1>No flashcards to display
-        <h5>Click '+' to add a flashcard</h5>
-      </h1>
-    );
-}
-function Body() {
-
-}
-
-function App() {
-  const [data, setData] = useState(null)
-  const [currentId, setCurrentId] = useState(null)
-  const[name, setName] = useState(null)
-  const [del, setDel] = useState(true)
-  // const tester = useReact()
-  setFunction = setData;
-  //const loadingState = useLoading()
-  const [currentFlashcardSet, status] = useLoading({ data: data, id: currentId })
-  console.log(currentFlashcardSet)
-  const [setCurrentFlashcardSet, msg] = useUpdate(
-    {
-      setData: setData,
-      id: currentId
-    }
-  )
-  const [isFront, setIsFront] = useState("front")
-  const [testing, setTesting] = useState(1)
-  const [appProperties, setChange] = useUpdateProperties({
-    init:
-    {
-      isEditOpen: false,
-      currentCard: 0,
-      isFront: "front",
-      isFlashcardListOpen: false,
-      testing1: testing,
-      flashcardSet: currentId
-    }
-  })
   function nextCard() {
-    setTesting(testing + 1)
-    if (appProperties.currentCard + 1 == currentFlashcardSet.length) {
-      console.log("loonnnng")
-      setChange(
-        { key: "currentCard", val: 0 }
-      )
+    let cc = appState.currentCard
+    console.log('helllo')
+    if (cc + 1 >= flashcardSet.length) {
+      //console.log("cc" + cc + "len: " + flashcardSet.length)
+      cc = 0;
     } else {
-      console.log("short")
-      setChange(
-        { key: "currentCard", val: appProperties.currentCard + 1 }
-      )
-      //setCurrentCardState(appProperties.currentCard + 1)
+      cc = cc +1;
+      //console.log("cc" + cc)
     }
-    /* setChange({
-       key: "isFront", val: 'front'
-     })*/
-    //setChange({key:"isFront", val: "front"})
+    dispatch([{type: 'currentCard',
+      currentCard: cc}, 
+      {type: 'isFront', isFront: 'front'}])
+  
+  }
+  
+  function previousCard() {
+    let cc= appState.currentCard
+    if (cc - 1 == -1) {
+      cc = flashcardSet.length - 1
+    } else {
+      cc = cc-1;
+    }
+    dispatch(
+      [{type: 'currentCard',
+      currentCard: cc}, 
+      {type: 'isFront', isFront: 'front'}]
+    )
   }
   function onKeyDown(event) {
     if (event.key === "ArrowRight") {
@@ -328,80 +278,119 @@ function App() {
       previousCard()
     }
   }
-  function previousCard() {
-    if (appProperties.currentCard - 1 == -1) {
-      setChange({
-        key: "currentCard", val: (currentFlashcardSet.length - 1)
-      })
-    } else {
-      setChange({
-        key: "currentCard", val: (appProperties.currentCard - 1)
-      })
-    }
-    setChange({ key: "isFront", val: "front" })
-  }
   function onClick() {
-    if (appProperties.isFront == "front") {
-      setChange({ key: "isFront", val: 'back' })
-    } else {
-      setChange({ key: "isFront", val: 'front' })
-    }
+    console.log('click')
+    dispatch({
+      type: 'isFront'
+    })
   }
-  //return(<div> testing </div>);
-  if(status === 404){
-    return(
-      <>
-
-        <p>Flashcard set wasn't retrieved successfully. </p>
-        <CreateHeader setTableId={setCurrentId}></CreateHeader>
-        <TestContext.Provider value={currentId}>
-          {
-            
-             del?
-                <DeleteConfirmation setData ={setCurrentId} TestContext ={TestContext} setDel = {setDel}> </DeleteConfirmation>
-          :null
-          }
-          <FlashcardSetCreateMenu setCurrentFlashcardSet={setCurrentFlashcardSet} appProperties={appProperties}></FlashcardSetCreateMenu>
-        </TestContext.Provider>
-      </>
-      
+  if(!name){
+    return(<p>select a set</p>)
+  }
+  return (flashcardSet !== null && Array.isArray(flashcardSet) && flashcardSet.length ?
+    <>
+    <h1>{name}</h1>
+    <div className='div--flashcard-container'  onKeyDown={onKeyDown}>
+      <button className={
+        `flashcard${!appState.isFlashcardListOpen ? "--fullscreen" : ""}`
+      } style={colors[appState.isFront]} onClick={onClick} dangerouslySetInnerHTML={{ __html: flashcardSet[appState.currentCard][appState.isFront]}}>
+      </button>
+      <div className="div-arrow-button">
+        <button className={`arrow__button${!appState.isFlashcardListOpen ? "--fullscreen" : ""} previous-button`} onClick={previousCard}>{'<-'}</button>
+        <button className={`arrow__button${!appState.isFlashcardListOpen ? "--fullscreen" : ""} next-button}`} onClick={nextCard}>{'->'}</button>
+      </div>
+      {!appState.isFlashcardListOpen ? <button className="material-symbols-outlined flashcard__minimize-button"
+        onClick={() => {
+          console.log('aaaaa')
+          dispatch({
+            type: "isFlashcardListOpen"
+          })
+        }}>
+        collapse_content
+      </button>:
+        <button className="material-symbols-outlined flashcard__minimize-button" onClick={() => {
+          dispatch(
+            {
+              type: 'isFlashcardListOpen'
+            }
+          )
+        }}>
+          open_in_full
+        </button>
+      }
+    </div></>
+    : <><h1>No flashcards to display</h1>
+      <h5>Click '+' to add a flashcard</h5></>
+    );
+}
+function Body() {
+  const [t, x] = useState(0);
+      // stores the user information
+    const [user, userDispatch] = useReducer(userReducer, {
+      user: null, 
+      loading: false
+    })
+    //console.log(user)
+    const [data, dataDispatch]  = useReducer(dataReducer, 
+      {
+        data: null, 
+        loading: false
+      }
     )
-  }
-
-  return (<>
-    <CreateHeader setTableId={setCurrentId} setName={setName}></CreateHeader>
-    {Array.isArray(currentFlashcardSet)?
-     <TestContext.Provider value={currentId}>
-        <div>
-          <DataContext.Provider value={currentFlashcardSet}>
-            
-            <div className='main-div' onKeyDown={onKeyDown} tabIndex="0">
-              <Flashcard nextCard={nextCard} previousCard={previousCard} handleClick={onClick} isFront={appProperties.isFront} appProperties={appProperties} setChange={setChange} ></Flashcard>
-            </div>
-            {appProperties.isFlashcardListOpen?
-              <div style={{ display: "flex", padding: "1vh" }}>
-                <button name='open-add-flashcard-menu' className='button--square' onClick=
-                  {() => {
-                    setChange({
-                      key: "isEditOpen", val: !appProperties.isEditOpen
-                    })
-                  }}>+</button>
-              </div>
-            :null}
-            {msg?<p>{msg}</p>:null}
-            <div className='flashcard-list-div'>
-              <FlashcardSetCreateMenu setCurrentFlashcardSet={setCurrentFlashcardSet} appProperties={appProperties}></FlashcardSetCreateMenu>
-              {appProperties.isFlashcardListOpen == false ? <></> :
-                <FlashcardSetListAllCards setChange={setChange} appProperties={appProperties} setCurrentFlashcardSet={setCurrentFlashcardSet}></FlashcardSetListAllCards>
-              }
-            </div>
-            
-          </DataContext.Provider>
-        </div>
-      </TestContext.Provider>
+    const [state, dispatch] = useReducer(appReducer, {
+      
+      isAddCardOpen: false,
+      currentCard: 0,
+      isFront: 'front',
+      isFlashcardListOpen: false
     
-      : <h1>select a set to begin</h1>}
-  </>
-  );
+  })
+  useDataHook(userDispatch, dataDispatch)
+  
+    return (<>
+      <p> {({} == null).toString()}</p>
+      <UserContext.Provider value={user}>
+      <DataContext.Provider value={data}>
+      
+        <CreateHeader userDispatch={userDispatch} dataDispatch={dataDispatch} user={user} data={data}></CreateHeader>
+          {
+            user.user?//obviously don't want to load in the flashcard data if not logged in
+            <div>
+                <div className='main-div' tabIndex="0">
+                  <Flashcard isFront={state.isFront} appState={state} dispatch={dispatch}>
+                  </Flashcard>
+                </div>
+                {(data.data !== null && Array.isArray(data.data.current_set))?
+                <>
+                    <div style={{ display: "flex", padding: "1vh" }}>
+                      <button name='open-add-flashcard-menu' className='button--square' onClick=
+                        {() => {
+                          dispatch({
+                            type: "isAddCardOpen"
+                          })
+                        }}>+</button>
+                    </div>
+                    <div className='flashcard-list-div'>
+                      <FlashcardSetCreateMenu userDispatch={userDispatch} dataDispatch={dataDispatch} appState={state}></FlashcardSetCreateMenu>
+                      {state.isFlashcardListOpen == false ? <></> :
+                        <FlashcardSetListAllCards dispatch={dispatch} appState={state} userDispatch={userDispatch} dispatchData={dataDispatch}>
+                        </FlashcardSetListAllCards>
+                      }
+                </div>
+                    </>
+                :null}
+            </div>
+            : <p>not logged in???</p>
+          }
+        </DataContext.Provider>
+        </UserContext.Provider>
+    </>
+    );
+}
+function App() {
+  /* const [currentFlashcardSet, status] = 
+      useFetchWithReload(currentId,{ data: data, id: currentId })*/
+      return(<Body></Body>)
+    
 }
 export default App;

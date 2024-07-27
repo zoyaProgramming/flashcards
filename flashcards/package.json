@@ -2,6 +2,7 @@
   "name": "flashcards",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:3500",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -11,6 +12,7 @@
     "node": "^18.20.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^6.25.1",
     "react-scripts": "5.0.1",
     "sqlite3": "^5.1.7",
     "web-vitals": "^2.1.4"

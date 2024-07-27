@@ -16,3 +16,4 @@ export default function useDeleteFunction(props)
     props.setData(Math.random())
   }, [data])
 }
+

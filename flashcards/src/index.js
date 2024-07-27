@@ -1,9 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
+/* styles*/
 import './styles.css'
+import './styles/login.css';
+import './styles/navbar.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+// React browser router
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
