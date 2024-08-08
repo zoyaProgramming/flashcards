@@ -1,10 +1,11 @@
 const initialState = {
   user: null,
-  loading: false
+  loading: false,
+  darkMode: ' light'
 };
 // copied from stackoverflow
 // basically controls the user
-export const userReducer = (state = initialState, action) => {
+exports.userReducer = (state = initialState, action) => {
   const { type, payload } = action;
 
   switch (type) {
@@ -14,17 +15,28 @@ export const userReducer = (state = initialState, action) => {
         loading: true
       };
     case "GET_USER":
+      let darkVariable = ' light'
+      switch(payload.dark_mode){
+      case 1:
+        darkVariable = ' dark'
+        break;
+      case 0:
+        darkVariable = ' light';
+        break;
+      }
       return {
         ...state,
         user: payload,
-        loading: false
+        loading: false,
+        darkMode: darkVariable
       };
 
     case "USER_ERROR":
       return {
         ...state,
         error: payload,
-        user: null
+        user: null,
+        loading: false
       };
     case "CLEAR_USER":
       return {
@@ -32,11 +44,13 @@ export const userReducer = (state = initialState, action) => {
         user: null,
         loading: false
       };
+    case("SWITCH_MODE"):
+    
+      return{
+        ...state,
+        darkMode: state.darkMode===' dark'?' light':' dark'
+      }
     default:
       return state;
   }
-};
-
-export const auth = (state = {}, action) => {
-  return state;
 };

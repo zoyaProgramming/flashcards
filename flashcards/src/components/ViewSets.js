@@ -1,6 +1,5 @@
 
 import { useContext, useState } from "react"
-import useSets from "../hooks/listAllSetsHook"
 import { addSetHandler, selectSetHandler } from "../functions/serverEventHandlers"
 
 
@@ -29,13 +28,16 @@ function SelectButton (props) {
 function Table(props) {
   
   const c = props.data;
-  const sets = props.data.data;
+  const sets = props.data.data.sets;
+  
   return(
     
     <table className="table--all-set-list all-set-list">
       <tbody className="all-set-list">
       {sets!=null && Array.isArray(sets)?sets.map((elem) => 
-      {return (
+      {
+        console.log('aaaaa')
+        return (
         <SelectButton key={Math.random()}elem={elem} setData={props.setData} setName={props.setName} setIsOpen = {props.setIsOpen} dataDispatch={props.dataDispatch}></SelectButton>
       )}
        ):null}
@@ -50,7 +52,7 @@ function Table(props) {
   return (
     <>
       <button className="bttn--navbar" onClick={() => {setAddSetMenu(!addSetMenu)}}>create new set</button>
-      {addSetMenu?<p><AddSetMenu setOpen = {setAddSetMenu} dataDispatch = {props.dataDispatch}></AddSetMenu></p>:null}
+      {addSetMenu?<><AddSetMenu setOpen = {setAddSetMenu} dataDispatch = {props.dataDispatch}></AddSetMenu></>:null}
     </>
     
     
@@ -67,9 +69,9 @@ function AddSetMenu(props) {
           props.setOpen(false)
         }}>
           <label className = "form__label" htmlFor="name">name: </label>
-          <input id="name" name="name"></input>
+          <input className="form__input" id="name" name="name"></input>
           <label className= "form__label" htmlFor="description">description: </label>
-          <input id="description" name="description"></input>
+          <input className = "form__input"id="description" name="description"></input>
           <button className="form__bttn--submit" type="submit" onClick={() => {
             console.log('submit clicked')
             
@@ -85,7 +87,7 @@ function AddSetMenu(props) {
 
 }
 
-export default function CenterMenu(props) {
+export default function ViewSets(props) {
  const test = [
   {test1: "value of test1", test2: "valueoftest2", test3: {
     key: "value"

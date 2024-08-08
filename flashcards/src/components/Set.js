@@ -1,99 +1,5 @@
-import logo from './logo.svg';
-import { submitUpdateHandler, fetchHandler, submitAddHandler, deleteHandler, firstReloadHandler} from './functions/serverEventHandlers.js';
-import {useUpdateProperties, useFetchWithReload } from './hooks/serverHooks.js';
-import sanitize from './functions/sanitize.js';
-import './App.css';
-import { useState, useReducer, useContext, createContext} from 'react';
-import './list.js';
-import deleteFunction from './hooks/deleteHook.js';
-import CreateHeader from './components/CreateHeader.js';
-import DeleteConfirmation from './components/DeleteConfirmation.js';
-import { dataReducer } from './functions/dataReducer.js';
-import { userReducer } from './functions/userReducer.js';
-import { useDataHook } from './hooks/useDataHook.js';
-import { UserSidebar } from './components/userMenu/userSidebar.js';
-import { useLoaderData, useOutletContext, Outlet} from 'react-router-dom';
-const DataContext = createContext(null)
-const UserContext = createContext(null)
-const DarkmodeContext = createContext('')
-const StateContext = createContext('')
+export default function Set( ){
 
-let setFunction = null;
-var terms = [{ front: "dog", back: "chien" },
-{ front: "i am", back: "je suis" },
-{ front: "my name is", back: "je m'appelle" }]
-const [minimizeIcon, maximizeIcon] = [null, null];
-
-
-function appReducer(state, action) {
-  const clone = JSON.parse(JSON.stringify(state))
-   function help (original, action, val)  {
-    switch(action.type) {
-      case 'isAddCardOpen'://horribly named
-        original.isAddCardOpen = !state.isAddCardOpen
-        break;
-      case 'isFlashcardListOpen':
-        original.isFlashcardListOpen = !original.isFlashcardListOpen;
-        break;
-      case 'currentCard':
-        //console.log(action.currentCard)
-        original.currentCard = action.currentCard
-        break;
-      case 'isFront':
-        let f = state.isFront
-        if(action.isFront === 'front'){
-          f = 'front'
-        } else if(state.isFront === 'front') {
-            f = 'back'
-          } else {
-            f = 'front'
-          }
-        original.isFront = f
-        break;
-      case 'reset':
-        original = ({isAddCardOpen: false,
-        currentCard: 0,
-        isFront: 'front',
-        isFlashcardListOpen: false})
-        break;
-    }
-  }
-
-
-
-  if(Array.isArray(action)) {
-    action.forEach((val) => {
-      help(clone, val)
-    })
-    return clone;
-  } else {
-    console.log('yeahhh')
-     help(clone, action)
-     return clone;
-  }
-  
-  throw Error('Unknown action: ' + action.type)
-}
-//Block Element Modifier
-function FlashcardDeleteButton({index, dispatchData}) {
-  const isDark = useContext(DarkmodeContext);
-  const flashcardData = useContext(DataContext).data.current_set
-  
-  return (
-    <button className={"button--square" + isDark}
-      onClick={() => {
-         deleteHandler(
-          {
-            front: flashcardData[index].front,
-            back: flashcardData[index].back
-          },
-          dispatchData
-        )
-      }
-      }
-    >x</button>
-  );
-}
 function FlashcardSetListElement({ dispatchData, appState, index , dispatch}) {
   const isDark = useContext(DarkmodeContext);
   let flashcardSetId = useContext(UserContext)
@@ -304,12 +210,12 @@ function Flashcard({handleClick, nextCard, previousCard, appState, dispatch, dis
     <h1>{name}</h1>
     <div className={"div--flashcard-container" + isDark}  onKeyDown={onKeyDown}>
       <button className={
-        `flashcard${(!appState.isFlashcardListOpen ? "--fullscreen" : "") + isDark}`
+        `flashcard${!appState.isFlashcardListOpen ? "--fullscreen" : ""}`
       } style={colors[appState.isFront]} onClick={onClick} dangerouslySetInnerHTML={{ __html: flashcardSet[appState.currentCard][appState.isFront]}}>
       </button>
       <div className={"div-arrow-button" + isDark}>
-        <button className={`arrow__button${!appState.isFlashcardListOpen ? "--fullscreen" : ""} previous-button` + isDark} onClick={previousCard}>{'<-'}</button>
-        <button className={`arrow__button${!appState.isFlashcardListOpen ? "--fullscreen" : ""} next-button}` + isDark} onClick={nextCard}>{'->'}</button>
+        <button className={`arrow__button${!appState.isFlashcardListOpen ? "--fullscreen" : ""} previous-button`} onClick={previousCard}>{'<-'}</button>
+        <button className={`arrow__button${!appState.isFlashcardListOpen ? "--fullscreen" : ""} next-button}`} onClick={nextCard}>{'->'}</button>
       </div>
       {!appState.isFlashcardListOpen ? <button className={"material-symbols-outlined flashcard__minimize-button" + isDark}
         onClick={() => {
@@ -338,120 +244,4 @@ function Flashcard({handleClick, nextCard, previousCard, appState, dispatch, dis
     );
 }
 
-export function C(){
-  const [dispatch, dataDispatch, setIsDark, userDispatch] = useOutletContext();
-  const state=useContext(StateContext)
-  const data = useContext(DataContext)
-  const userState=useContext(UserContext)
-  console.log(userState)
-  const isDark=useContext(DarkmodeContext)
-  return(
-    userState?//obviously don't want to load in the flashcard data if not logged in
-      
-      <>
-        <div className={"main-div" + isDark} tabIndex="0">
-        
-          <Flashcard isFront={state.isFront} appState={state} dispatch={dispatch}>
-          </Flashcard>
-          
-        </div>
-        {data.data !== null && Array.isArray(data.data.current_set)?
-        <>
-            <div style={{ display: "flex", padding: "1vh" }}>
-              <button name='open-add-flashcard-menu' className={"button--square" + isDark} onClick=
-                {() => {
-                  dispatch({
-                    type: "isAddCardOpen"
-                  })
-                }}>+</button>
-            </div>
-            <div className={"flashcard-list-div" + isDark}>
-              <FlashcardSetCreateMenu userDispatch={userDispatch} dataDispatch={dataDispatch} appState={state}></FlashcardSetCreateMenu>
-              {state.isFlashcardListOpen == false ? <></> :
-                <FlashcardSetListAllCards dispatch={dispatch} appState={state} userDispatch={userDispatch} dispatchData={dataDispatch}>
-                </FlashcardSetListAllCards>
-              }
-           </div>
-        </>
-        :null}
-    </>
-    : <p>not logged in???</p>
-  )
-}
-
-function Body() {
-  const [isDarkMode, setIsDark] = useState('light')
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [profile_pic, setPic] = useState(null)
-
-  console.log(profile_pic)
-  const [t, x] = useState(0);
-      // stores the user information
-    const [userState, userDispatch] = useReducer(userReducer, {
-      user: null, 
-      loading: false
-    })
-    //console.log(user)
-    const [data, dataDispatch]  = useReducer(dataReducer, 
-      {
-        data: null, 
-        loading: false
-      }
-    )
-    const [state, dispatch] = useReducer(appReducer, {
-      
-      isAddCardOpen: false,
-      currentCard: 0,
-      isFront: 'front',
-      isFlashcardListOpen: false
-    
-  })
-  useDataHook(userDispatch, dataDispatch, setPic)
-  let darkVariable = ' light'
-  if(userState.user) {
-    switch(userState.user.dark_mode){
-      case 1:
-        darkVariable = ' dark'
-        break;
-      case 0:
-        darkVariable = ' light';
-        break;
-    }
-  }
-    return (<>
-    <div className={"r" + isDarkMode} style={{display: 'flex',
-      flexDirection: 'row',
-      height: '100%',
-
-      flexWrap: 'nowrap',
-      maxWidth: '100vw',
-      width: '100vw',
-
-      flexBasis: 'auto',
-      minWidth: '0'
-    }}>
-      <DarkmodeContext.Provider value={userState.darkMode}>
-      <UserContext.Provider value={userState.user}>
-        {sidebarOpen?<UserSidebar UserContext={UserContext} userDispatch={userDispatch} dataDispatch={dataDispatch} DarkmodeContext={DarkmodeContext} setIsDark={setIsDark}></UserSidebar>:null}
-      <DataContext.Provider value={data}>
-      <StateContext.Provider value={state}>
-      <div>
-        <CreateHeader darkContext={DarkmodeContext} setProfilePic={setPic} profile_pic={profile_pic} userDispatch={userDispatch} dataDispatch={dataDispatch} userData={userState} data={data} setSidebarOpen = {setSidebarOpen} sidebarOpen={sidebarOpen} setDarkmode ={setIsDark}></CreateHeader>
-        <Outlet context={[dispatch, dataDispatch, setIsDark, userDispatch]}></Outlet>
-          
-          </div>
-        </StateContext.Provider>
-        </DataContext.Provider>
-        </UserContext.Provider>
-        </DarkmodeContext.Provider>
-        </div>
-    </>
-    
-    );
-}
-export function App() {
-  
-  /* const [currentFlashcardSet, status] = 
-      useFetchWithReload(currentId,{ data: data, id: currentId })*/
-      return(<Body></Body>)
 }

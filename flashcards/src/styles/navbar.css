@@ -20,29 +20,144 @@
   flex-direction: row;
   align-items: center;
   margin: 2px;
-  
 }
+
 .bttn--navbar{
-  margin:2px;
-  
+  vertical-align: middle;
   color: rgb(122, 144, 166);
   border-radius: 20px;
   border-width: 0px;
   padding: 0;
-  height: 5vh;
-  width: 8vw;
-  font-size:16px;
+  height: fit-content;
+  font-size:xx-large;
   display: inline-block;
   text-align: center;
-  line-height: 2vh;
+  line-height: 5vh;
+  font-family: "Titillium Web";
+
 }
 .bttn--navbar:hover{
   color: #28589b;
   background-color: #d7dce4;
 }
+.bttn--navbar.dark{
+  color: rgb(150, 150, 150);
+  background-color: rgb(80, 80, 80);
+}
+.bttn--navbar.dark:hover{
+  
+}
 .h1--navbar{
   margin: 2px;
-  height: 100%;
-  line-height: 5vh;
+  line-height: 7vh;
+  font-size: 7vh;
   font-weight: 400 !important;
+  height: 7vh;
+  display: inline-block;
+  width: 100%;
+  text-decoration: none !important;
+}
+.h1--navbar.dark a{
+  color:rgb(200, 200, 200)
+}
+
+a{
+  text-decoration: none;
+}
+.dark{
+  border-color: #161616;
+}
+
+
+.h1--header--username{
+  color: rgb(122, 144, 166);
+  display: inline-block;
+  width: auto;
+  height: fit-content;
+  font-size: xx-large;
+  margin: 0;
+}
+
+.a__img-link{
+  width: max-content;
+  height: 100%;
+  display: inline-block;
+  box-sizing: border-box;
+  font-size: 0;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.img--profile-icon{
+  width: 10vh;
+  height: 10vh;
+}
+.img--profile-icon:hover{
+  opacity: .5;
+}
+
+.user-sidebar:hover{
+  cursor: default;
+}
+
+.li--link-sidebar{
+  width: 100%;
+  height: max-content;
+  font-size: large;
+  list-style: none;
+}
+
+.menu--button{
+  margin: 0;
+  height: 7vh;
+  display: inline-block;
+  margin: 2px;
+  width: 7vh;
+  font-size: 7vh;
+  line-height: 7vh;
+  border-radius: 0;
+  text-align: center;
+  padding: 0;
+  border: none;
+}
+.menu--button:hover{
+  color: #28589b;
+
+}
+
+.li--link-sidebar:hover{
+  color: #616d7c;
+}
+
+.input--search{
+  width: 50vw;
+  border-radius: 30px;
+  border: 0px solid rgb(122, 144, 166);
+  height: 5vh;
+  background-color: rgb(249, 249, 249) !important;
+  
+}
+.input--search.dark{
+  background-color: rgb(100, 100, 100) !important
+}
+.bttn--search{
+  color: #3C4653;
+  height: 5vh;
+  width: 5vh;
+  border: none;
+  background-color: none;
+
+}
+.bttn--search:hover{
+  color: #6e8199;
+}
+
+.bttn--search.dark{
+  background-color: rgb(100, 100, 100);
+  color:rgb(120, 120, 120);
+}
+.bttn--search.dark:hover{
+  color:rgb(160, 160, 160);
 }

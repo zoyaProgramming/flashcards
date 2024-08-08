@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { signupHandler } from "../../functions/serverEventHandlers"
 
-export  function SignupForm({setSignupFormOpen, userDispatch}) {
+export  function SignupForm({setFormsOpen, userDispatch, formsOpen}) {
   const [signupState, setSignupState] = useState(null)
   
     return(
@@ -19,8 +19,11 @@ export  function SignupForm({setSignupFormOpen, userDispatch}) {
           <button className="form__bttn--submit--login" type="submit" >submit</button>
           <button className="form__bttn--submit--login" type="submit" onClick={() => {
             console.log('submit clicked')
-            setSignupFormOpen(false)
-          }}>submit</button>
+            setFormsOpen({
+              login: false,
+              submit: true
+            })
+          }}>this isnt the same</button>
           
         </form>
       </div>

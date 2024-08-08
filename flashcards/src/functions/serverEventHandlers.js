@@ -1,6 +1,6 @@
 
 import sanitize from "./sanitize";
-
+import loadProfilePic from "./loadProfilePic";
 
 
 // dispatch needs: action object with a type, a "payload" that's either an error or data"
@@ -107,7 +107,7 @@ export async function signupHandler(event, userDispatch) {
     user: user,
     password: pass
   }))
-  userDispatch(undefined, {type: 'LOADING_USER', payload: null})
+  userDispatch({type: 'LOADING_USER', payload: null})
   const request = await fetch('http://localhost:3500/signup', {
     method: 'post',
     headers: {
@@ -121,27 +121,31 @@ export async function signupHandler(event, userDispatch) {
   })
   if (request.ok) {
     const result = await request.json()
-    userDispatch(undefined, {type: 'GET_USER', payload:{result}
+    userDispatch({type: 'GET_USER', payload:result
     })
   } else if(request.status == 500) {
     const body = await request.text()
     console.log(body)
-    userDispatch(undefined, {type: 'USER_ERROR', payload: body})
+    userDispatch({type: 'USER_ERROR', payload: body})
   } else if (request.status == 404) {
     const body = await request.text()
     console.log(body)
-    userDispatch('USER_ERROR', {type: 'USER_ERROR',payload: body})
+    userDispatch({type: 'USER_ERROR',payload: body})
   }
 }
 
 
-export async function loginHandler(event, userDispatch) {
+export async function loginHandler(event, userDispatch, profile_pic, dataDispatch) {
   const localhost = 'http://localhost:3500/'
   const data = new FormData(event.target)
   const user = data.get('username');
   const pass = data.get('password');
   userDispatch( {
     type:'LOADING_USER',
+    payload: null
+  })
+  dataDispatch( {
+    type:'LOADING_DATA',
     payload: null
   })
   const request = await fetch(localhost + 'login', {
@@ -151,26 +155,38 @@ export async function loginHandler(event, userDispatch) {
     },
     credentials: 'include',
     body: JSON.stringify({
-      user: user,
-      pass: pass
+      username: user,
+      password: pass
     })
   }
   
   )
   if(!request.ok) {
     const msg = await request.text()
+    console.log(msg)
     userDispatch({
       type:'USER_ERROR',
       payload: msg
     })
+    dataDispatch({
+      type:'DATA_ERROR',
+      payload: msg
+    })
   } else {
     const result = await request.json()
-    console.log(result.user)
+    console.log(result)
     userDispatch({
       type:'GET_USER',
-      payload: result.user
+      payload: result.user.username
     })
+    dataDispatch({
+      type: 'GET_DATA',
+      payload: result
+    })
+    loadProfilePic(profile_pic)
   }
+
+
 }
 
 export async function addSetHandler(event, dataDispatch){
@@ -199,7 +215,9 @@ export async function addSetHandler(event, dataDispatch){
       type: 'GET_DATA',
       payload: result
     })
+
   } else{
+    console.log('one less problem without u')
     const msg = await request.text()
     dataDispatch({
       type: 'DATA_ERROR',
@@ -229,6 +247,7 @@ export async function selectSetHandler(event, dataDispatch, setname, description
 
     if(response.ok) {
       const result = await response.json()
+      console.log('oh yeah')
       dataDispatch({
         type: 'GET_DATA',
         payload: result
@@ -257,7 +276,9 @@ export async function loadSetHandler(dataDispatch) {
     console.log('reee')
     const result = await response.json()
     dataDispatch( {
-      type:'GET_DATA',
+      type:'UPDATE_DATA',
+      updateType: 'sets',
+
       payload: result
     })
   } else {
@@ -295,6 +316,51 @@ export async function firstReloadHandler( userDispatch, dataDispatch){
   }
   
 }
+
+export async function searchHandler( setContent, type, data) {
+  const body = type==='user'?{
+    type: 'user',
+    user: data}:{
+      type: 'set',
+      set:data}
+  setContent({
+    type: 'LOADING_SEARCH', payload: null
+  })
+  const result = await fetch('http://localhost:3000/search',{method: 'post', credentials: 'include', headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(body)
+  })
+  if(!result.ok){
+    console.log('one less problem without you')
+    setContent({
+      type: 'SEARCH_ERROR', payload: null
+    })
+  } else {
+    
+    const jsonResult = await result.json()
+    console.log(jsonResult.data)
+    setContent({
+      type: 'GET_SEARCH', payload: jsonResult.data
+    })
+  }
+}
+
+
+export async function switchMode(options){
+  const result = await fetch('http://localhost:3000/options', {
+    method: 'post',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(options)
+  })
+  if(!result.ok){
+    console.log('success chaning options')
+  }
+}
+
+
+
+
 export * from './serverEventHandlers'
 
 

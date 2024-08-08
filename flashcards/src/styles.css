@@ -44,6 +44,7 @@ header{
   font-style: normal;
   width: 100%;
   box-sizing: border-box;
+  flex-shrink: 1;
 }
 
 
@@ -57,6 +58,31 @@ div .main-div{
     margin: none;
     background-color: #ffffff;
     border-width: 1px;
+    flex-shrink: 1;
+}
+
+.dark{
+    color: rgb(255, 255, 255);
+    background-color: rgb(60, 60, 60) ;
+    border-color: rgb(60, 60, 60);
+}
+
+.dark:hover{
+    color:rgb(220, 220, 220) !important
+    
+}
+.light{
+    color: rgb(122, 144, 166) !important;
+    background-color: #ffffff !important;
+}
+.light:hover{
+    color: #28589b !important; 
+}
+
+
+
+.main-div.dark{
+    background-color:rgb(80, 80, 80) !important;
 }
 
 .main-div--full-screen{
@@ -92,6 +118,7 @@ div .main-div{
     margin: auto;
     width: 100%;
     max-width: 100%;
+    min-width: none;
     margin-top: 5vh;
     height: fit-content;
     display: block;
@@ -104,6 +131,19 @@ div .main-div{
     flex-direction: column;
     
 }
+.div--flashcard-container.dark{
+    background-color:rgb(80, 80, 80);
+}
+.div--flashcard-container.dark * {
+    background-color:rgb(80, 80, 80) ;
+    color: rgb(150, 150, 170)
+}
+.div--flashcard-container.dark *:hover {
+    color: rgb(150, 150, 160)
+}
+
+
+
 .flashcard{
     font-family: 'Courier New', Courier, monospace;
     width: 50vw;
@@ -125,13 +165,16 @@ div .main-div{
     flex-direction: row;
 }
 .flashcard--fullscreen{
-    min-width: 80vw;
+    min-width: 0;
     height: 50vh;
     display: block;
     margin:auto;
     font-size: 4em;
 }
-
+.flashcard--fullscreen.dark{
+    background-color: rgb(90, 90, 95);
+    border: 0px;
+}
 .flashcard__minimize-button{
     display: block;
     bottom:20px;
@@ -171,7 +214,7 @@ div .main-div{
 .arrow__button--fullscreen{
     margin-top: 10px;
     margin-left: 5px;
-    min-width: 40vw;
+    min-width: 10vw;
     display: block;
     height: auto;
     font-size: 5em;
@@ -209,7 +252,6 @@ div .main-div{
     -ms-flex-align: center;
     justify-content: center;
     text-align: center;
-    vertical-align: middle;
     line-height: 7vh;
     padding:0;
 }
@@ -320,6 +362,30 @@ table, td, th, tr{
     color: #701355;
 }
 
+.button--add {
+    color: rgb(122, 144, 166);
+    border-radius: 20px; /* Combined border-radius value */
+    border: none; /* Replaces border-width: 0px */
+    line-height: 7vh; /* No need for !important if it's the only declaration */
+    width: 5vh;
+    height: 5vh;
+    padding: 0;
+    font-size: 5vh;
+    white-space: nowrap; /* Prevents text from wrapping */
+    text-align: center; /* Center-aligns text */
+    justify-content: center; /* Not needed here without flex container */
+    display: inline-flex; /* Added display: flex to use justify-content if needed */
+    align-items: center; /* Vertically centers text within the button */
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.button--add:hover{
+    
+    color: #28589b;
+    background-color: #d7dce4;
+
+}
 th{
     width:0;
 }
@@ -391,6 +457,15 @@ table{
     
 
     
+}
+.flashcard-list-div.dark{
+    background-color: rgb(60, 60, 60);
+}
+.flashcard-list-div__input.dark{
+    background-color: rgb(60, 60, 60);
+}
+.flashcard-list-div-header.dark{
+    background-color: rgb(60, 60, 60);
 }
 
 
@@ -489,4 +564,12 @@ padding-bottom:8px;
 }
 .button--delete-confirmation{
 
+}
+
+
+
+.label--form{
+    width: fit-content;
+    display: block;
+    margin: auto;
 }
