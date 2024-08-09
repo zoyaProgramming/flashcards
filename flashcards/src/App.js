@@ -12,7 +12,7 @@ import { dataReducer } from './functions/dataReducer.js';
 import { userReducer } from './functions/userReducer.js';
 import { useDataHook } from './hooks/useDataHook.js';
 import { UserSidebar } from './components/userMenu/userSidebar.js';
-import { useLoaderData, useOutletContext, Outlet} from 'react-router-dom';
+import { useLoaderData, useOutletContext, Outlet, useActionData} from 'react-router-dom';
 const DataContext = createContext(null)
 const UserContext = createContext(null)
 const DarkmodeContext = createContext('')
@@ -350,14 +350,13 @@ export function C(){
       
       <>
         <div className={"main-div" + isDark} tabIndex="0">
-        
           <Flashcard isFront={state.isFront} appState={state} dispatch={dispatch}>
           </Flashcard>
           
         </div>
         {data.data !== null && Array.isArray(data.data.current_set)?
         <>
-            <div style={{ display: "flex", padding: "1vh" }}>
+            <div className = {isDark} style={{ display: "flex", padding: "1vh" }}>
               <button name='open-add-flashcard-menu' className={"button--square" + isDark} onClick=
                 {() => {
                   dispatch({
@@ -380,7 +379,10 @@ export function C(){
 }
 
 function Body() {
-  const [isDarkMode, setIsDark] = useState('light')
+  const rgb = useActionData()
+  
+  console.log("refresh: " + rgb)
+  const [isDarkMode, setIsDark] = useState(' light')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [profile_pic, setPic] = useState(null)
 
@@ -406,7 +408,7 @@ function Body() {
       isFlashcardListOpen: false
     
   })
-  useDataHook(userDispatch, dataDispatch, setPic)
+  useDataHook(userDispatch, dataDispatch, setPic, rgb)
   let darkVariable = ' light'
   if(userState.user) {
     switch(userState.user.dark_mode){
@@ -419,7 +421,8 @@ function Body() {
     }
   }
     return (<>
-    <div className={"r" + isDarkMode} style={{display: 'flex',
+    <DarkmodeContext.Provider value={userState.darkMode}>
+    <div className={"r" + userState.darkMode} style={{display: 'flex',
       flexDirection: 'row',
       height: '100%',
 
@@ -430,12 +433,12 @@ function Body() {
       flexBasis: 'auto',
       minWidth: '0'
     }}>
-      <DarkmodeContext.Provider value={userState.darkMode}>
+      
       <UserContext.Provider value={userState.user}>
         {sidebarOpen?<UserSidebar UserContext={UserContext} userDispatch={userDispatch} dataDispatch={dataDispatch} DarkmodeContext={DarkmodeContext} setIsDark={setIsDark}></UserSidebar>:null}
       <DataContext.Provider value={data}>
       <StateContext.Provider value={state}>
-      <div>
+      <div style={{maxHeight: '100vh', display: 'flex', flexDirection: 'column'}}>
         <CreateHeader darkContext={DarkmodeContext} setProfilePic={setPic} profile_pic={profile_pic} userDispatch={userDispatch} dataDispatch={dataDispatch} userData={userState} data={data} setSidebarOpen = {setSidebarOpen} sidebarOpen={sidebarOpen} setDarkmode ={setIsDark}></CreateHeader>
         <Outlet context={[dispatch, dataDispatch, setIsDark, userDispatch]}></Outlet>
           
@@ -443,8 +446,9 @@ function Body() {
         </StateContext.Provider>
         </DataContext.Provider>
         </UserContext.Provider>
-        </DarkmodeContext.Provider>
+        
         </div>
+        </DarkmodeContext.Provider>
     </>
     
     );

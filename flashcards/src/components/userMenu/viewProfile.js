@@ -5,7 +5,8 @@ import {
   Link,
   useParams,
   Outlet,
-  Form
+  Form,
+  useActionData
 } from "react-router-dom";
 import { useDataHook } from "../../hooks/useDataHook";
 import { dataReducer } from '../../functions/dataReducer.js';
@@ -13,7 +14,7 @@ import { userReducer } from '../../functions/userReducer.js';
 
 import { useState, useReducer, useContext, createContext} from 'react';
 import { uploadProfilePic, test} from "../../functions/uploadProfilePic.js";
-
+ 
 
 // this should change the current user's table
 export function PicSelector({picSrc, setPicSrc}) {
@@ -83,6 +84,7 @@ function EditParagraphForm({user}){
 
 export  function ProfileView ({useParams}) {
   const params = useParams()
+  const actionData = useActionData();
   const [editMode, setEditMode] = useState(false);
   const [picSrc, setPicSrc] = useState(null)
   const [editProfilePicOpen, setEditProfilePicOpen] = useState(false)
@@ -97,7 +99,7 @@ export  function ProfileView ({useParams}) {
       loading: false
     }
   )
-  const getData = useDataHook(userDispatch, dataDispatch, setPicSrc)
+  const getData = useDataHook(userDispatch, dataDispatch, setPicSrc, actionData)
   var pp = null;
   if(data.data && data.data.profilePic) {
     console.log(data.data.profilePic)
@@ -106,12 +108,16 @@ export  function ProfileView ({useParams}) {
   if(!user.user || !data.data) {
     return(<p>loading {JSON.stringify(user) + JSON.stringify(data)}</p>)
   }
+  let isDark = ' light'
+  if(user.user){
+    isDark = user.darkMode;
+  }
   
   if(!editMode) {return (
     
     <div className="body--profile">
-      <button onClick={()=>{setEditMode(!editMode)}}>balls</button>
-      <button onClick={() => {setEditProfilePicOpen(!editProfilePicOpen)}}
+      <button className={isDark} onClick={()=>{setEditMode(!editMode)}}>Edit</button>
+      <button  className={isDark} onClick={() => {setEditProfilePicOpen(!editProfilePicOpen)}}
       style={{background: 'none', border: 'none', width: 'fit-content', height: 'fit-content', display: 'block', margin: 'auto'}}>
         <img className="img--profile-icon" src={picSrc}style={{height: '100px', width: '100px', margin: 'auto', display: 'block', marginTop: '5vh'}}></img>
       </button>

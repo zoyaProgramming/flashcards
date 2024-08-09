@@ -146,3 +146,25 @@ exports.updateOptions = function(req, res, next) {
     }
   })
 }
+
+exports.deleteUser = function(req, res, next) {
+  const id = req.user.id;
+  const pass = req.user.password;
+  req.logout(null, (err)=>{
+    if(err){
+      res.status(500)
+      res.setHeader('Content-Type', 'text/plain');
+      res.send(err);
+    } else {
+      db.run('DELETE FROM user WHERE id=? AND password=?;', [id, pass], (err, response) => {
+        if(err) {
+          res.sendStatus(404)
+        } else {
+          res.sendStatus(200)
+        }
+      }) 
+
+    }
+  })
+  
+}

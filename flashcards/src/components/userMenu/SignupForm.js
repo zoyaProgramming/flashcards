@@ -3,6 +3,7 @@ import { signupHandler } from "../../functions/serverEventHandlers"
 
 export  function SignupForm({setFormsOpen, userDispatch, formsOpen}) {
   const [signupState, setSignupState] = useState(null)
+
   
     return(
       <div className="div--login-form">

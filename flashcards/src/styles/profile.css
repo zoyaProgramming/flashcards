@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   margin: 10px;
-  background-color: rgb(255, 255, 255);
   border: 1px solid gainsboro;
   border-radius: 20px;
   box-sizing: border-box;
@@ -11,6 +10,7 @@
 }
 .ul--set-list{
   font-size: 18px;
+  padding: 40px;
 }
 
 .link--set{
@@ -127,13 +127,29 @@ input[type="file"]{
   width: max-content;
   padding: 10px;
   border-radius: 50px;
-  background-color: rgb(149, 49, 49);
-  color: rgb(0, 0, 0);
+  background-color: rgb(149, 49, 49)  !important;
+  color: rgb(0, 0, 0) !important;
 }
 .bttn--red:hover{
   background-color: rgb(200, 49, 49);
   border-radius: 50px;
-  color:  rgb(0, 0, 0);
+  color:  rgb(80, 0, 0) !important; 
+}
+
+.r.dark .div--set-list{
+  background-color: rgb(100, 100, 100) !important;
+  border: 1px solid rgb(120, 120, 120);
+}
+.r.dark .link--set{
+  color: rgb(220, 220, 220);
+}
+.r.dark .link--set:hover{
+  color: rgb(255, 255, 255);
+}
+.r.dark .link--description{
+  color: rgb(200, 200, 200);
+  width: 100%;
+  border-bottom: 1px solid rgb(140, 140, 140);
 }
 
 

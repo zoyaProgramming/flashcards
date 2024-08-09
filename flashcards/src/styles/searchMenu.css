@@ -1,8 +1,12 @@
+
+.r.dark *{
+  border-color: rgb(130, 130, 140);
+}
+
 .div--search{
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: rgb(249, 249, 249) !important;
   border: 1px solid rgb(240, 240, 240);
   border-radius: 5px;
   min-width: none;
@@ -55,6 +59,10 @@
   display: flex;
   border-bottom: 1px solid rgb(240, 240, 250);
 }
+
+.r.dark .scroller-items{
+  border-bottom: 1px solid rgb(90, 90, 90);
+}
 .select--result{
   padding: 20px;
 }
@@ -73,6 +81,11 @@
   padding: 10px;
   border-top: 1px solid rgb(230, 230, 230);
   border-bottom: 0px;
+}
+.ul--search{
+
+  height: min-content;
+  overflow: auto;
 }
 .ul--search:last-child {
   border-bottom:1px solid rgb(230, 230, 230);;

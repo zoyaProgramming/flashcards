@@ -14,6 +14,10 @@ div:not(#root){
     width: 100%;
 }
 
+.r.dark >* {
+    background-color: rgb(80, 80, 80);
+  }
+
 h1{
     font-size: 18px;
     font-weight: 600;
@@ -326,13 +330,28 @@ table, td, th, tr{
     position: fixed;
     justify-content: center;
     width: fit-content !important;
-    background-color: rgb(235, 189, 231);
-
+    background-color: white;
+    padding: 2vh;
+    border-radius: 20px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 
 }
+
+.r.dark .div--center-overlapping{
+    background-color: rgb(100, 100, 100);
+    border: 1px solid rgb(130, 130, 130);
+}
+.r.dark .div--center-overlapping *{
+    color: rgb(200, 200, 200);
+}
+
+.r.dark .tr--all-set-list{
+    color: rgb(180, 180, 180);
+
+}
+
 .button--close{
     position: fixed;
     top: 10px;
@@ -540,8 +559,6 @@ padding-bottom:8px;
     border: 0px;
     background: none;
     white-space: nowrap;
-    
-    
 }
 .table--button{
    
@@ -555,7 +572,7 @@ padding-bottom:8px;
 
 }
 .table--button:hover{
-    background:rgb(232, 170, 227);
+    background:rgb(110, 110, 110);
     color: #701355;
 }
 

@@ -75,6 +75,8 @@ router.post('/logout', (req, res) => {
   });
 })
 
+router.post('/delete', userController.deleteUser)
+
 router.get('/search/:term', dataController.search)
 router.post('/selectset', dataController.selectSet, dataController.fetchData)
 router.post('/createSet', createSet, dataController.fetchData)
@@ -91,7 +93,6 @@ router.post("/save", addCard, dataController.fetchData);
 router.post('/update', save, fetchFunction);
 router.post('/options', userController.updateOptions, fetchFunction)
 module.exports = router;
-
 
 
 

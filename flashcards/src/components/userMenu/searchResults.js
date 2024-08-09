@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLoaderData,  } from "react-router-dom";
 function usePic(test, setPic) {
   useEffect(() => {
@@ -46,33 +46,36 @@ function ProfileIcon({userData, profile_pic, isDark}) {
 
   const c = profile_pic;
   return (
-        <img className={"img--profile-icon-search-results " + isDark} src={src} height={50} width={50}>
+        <img className="img--profile-icon-search-results " src={src} height={50} width={50}>
         </img>
         
   )
 }
 
-export default function SearchResults({results, isDark}) {
+export default function SearchResults({results}) {
   const [openedMenus, setOpenedMenus] = useState({users: true, sets: false})
   const [selected, setSelected] = useState(0)
+
   const test = useLoaderData();
+  
 
   if(test){
+
     let resultsMapped=[]
     if(selected==0 && Array.isArray(test.users)) {
        resultsMapped = test.users.map((value)=> {
         if(value.user_name){
           return(
             <li className="li--user">
-              <ProfileIcon userData={value} isDark={isDark}></ProfileIcon>
-                <a className={"link " + isDark} href={"/users/" + value.user_name +'/profile'}>{value.user_name}</a>
+              <ProfileIcon userData={value}></ProfileIcon>
+                <a className="link " href={"/users/" + value.user_name +'/profile'}>{value.user_name}</a>
             </li>
           )
         } else {
           return(
                 <li className="li--link-sidebar">
-                  <a className={"link " + isDark}href={"/users/" + value.user_id + "/sets" + value.set_name}>{value.set_name}</a>
-                  <button className={"material-symbols-outlined button--add " + isDark}>add</button>
+                  <a className={"link "}href={"/users/" + value.user_id + "/sets" + value.set_name}>{value.set_name}</a>
+                  <button className={"material-symbols-outlined button--add "}>add</button>
                 </li>
           )
         }
@@ -82,7 +85,7 @@ export default function SearchResults({results, isDark}) {
         if(value.user_name){
           return(
             <li className="li--search-results">
-                <a className={"link " + isDark} href={"/users/" + value.user_name +'/profile'}>{value.user_name}</a>
+                <a className="link " href={"/users/" + value.user_name +'/profile'}>{value.user_name}</a>
               </li>
           )
         } else {
@@ -90,8 +93,8 @@ export default function SearchResults({results, isDark}) {
                 
                 <li className="li--search-results">
                   
-                  <a className={"link " + isDark}href={"/users/" + value.user_id + "/sets" + value.set_name}>{value.set_name}</a>
-                  <button className={"material-symbols-outlined button--add " + isDark}>add</button>
+                  <a className="link "href={"/users/" + value.user_id + "/sets" + value.set_name}>{value.set_name}</a>
+                  <button className={"material-symbols-outlined button--add "}>add</button>
                 </li>
           )
         }
@@ -101,7 +104,7 @@ export default function SearchResults({results, isDark}) {
     
     return(
       <>
-        <div className={"div--search " + isDark} style={{padding: "20px"}}>
+        <div className="div--search " style={{padding: "20px"}}>
             <h1 className="h1--results">Results for <span className="span--dark">"{test.term}"</span></h1>
               <div className="scroller-items">
                 <a className={"select--result" + (selected===0?" selected":"")}
@@ -115,47 +118,14 @@ export default function SearchResults({results, isDark}) {
 
 
 
-        <div>
-          <ul  className="ul--search" style={{width: '100%'}}>
-            
+        <div style={{maxHeight: '100%', overflow: 'auto'}}>
+          <ul  className="ul--search " style={{width: '100%'}}>
             {resultsMapped}
           </ul>
         </div>
       </>
     )
   }
-  if(true){
-    return(
-      <p>{"good lord"}</p>
-    )
-
-  }
-  if(!(results) || !(results.data)) {
-    <p>{test}</p>
-    return (<p>damn{JSON.stringify(results.results)}</p>);
-  } else {
-    const resultsMapped = results.data.map((value)=> {
-      return(
-       
-            <li className="li--link-sidebar">
-              {value.set_name}
-              <button className={"material-symbols-outlined button--add " + isDark}>add</button>
-            </li>
-            
-      )
-      })
-    return (
-      <>
-
-        <div className={"div--search " + isDark} >
-          <h1>Sets: </h1>
-          <ul style={{width: '100%'}}>
-            {resultsMapped}
-          </ul>
-        </div>
-      </>
-    )
-    }
 }
 export  function SearchResults1(){
   const [openedMenus, setOpenedMenus] = useState({users: true, sets: false})

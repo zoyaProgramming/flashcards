@@ -36,15 +36,17 @@
   font-family: "Titillium Web";
 
 }
+
 .bttn--navbar:hover{
   color: #28589b;
   background-color: #d7dce4;
 }
-.bttn--navbar.dark{
+.r.dark .bttn--navbar{
   color: rgb(150, 150, 150);
   background-color: rgb(80, 80, 80);
 }
-.bttn--navbar.dark:hover{
+.r.dark .bttn--navbar:hover{
+  color: rgb(170, 170, 190);
   
 }
 .h1--navbar{
@@ -161,3 +163,6 @@ a{
 .bttn--search.dark:hover{
   color:rgb(160, 160, 160);
 }
+
+
+/* dark mode:::*/

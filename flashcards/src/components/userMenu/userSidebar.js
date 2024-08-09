@@ -14,8 +14,8 @@ export function UserSidebar({UserContext, userDispatch, dataDispatch, setIsDark,
       <>
         <div className={"user-sidebar " + isDark}>
           <ul className={"ul-links " + isDark}>
-            <a href={"/" + user.user_name}><li className={"li--link-sidebar " + isDark}>View Profile</li></a>
-            <a href={"/" + user.user_name + '/options'}> <li className={"li--link-sidebar " + isDark}>Account Options</li></a>
+            <a href={"http://localhost:3000/" + user.user_name}><li className={"li--link-sidebar " + isDark}>View Profile</li></a>
+            <a href={"http://localhost:3000/" + user.user_name + '/options'}> <li className={"li--link-sidebar " + isDark}>Account Options</li></a>
             <li className={"li--link-sidebar " + isDark} onClick={() => {userDispatch({type: "SWITCH_MODE"})}}>Change Theme</li>
             <li className={"li--link-sidebar " + isDark} onClick={() => {logoutHandler(userDispatch, dataDispatch)
               navFunction('')

@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-export function useDataHook( userDispatch, dataDispatch, setPic){
+export function useDataHook( userDispatch, dataDispatch, setPic, rgb){
   
 
   useEffect(()=> {
@@ -9,6 +9,7 @@ export function useDataHook( userDispatch, dataDispatch, setPic){
       payload: null
     })
     async function callBackendAPI() {
+      console.log('rgb changed')
       const userExists = await fetch('http://localhost:3500/',{method: 'get', credentials: "include", headers: {
         "Access-Control-Allow-Credentials": true,
         "Access-Control-Allow-Origin": true,      
@@ -18,7 +19,7 @@ export function useDataHook( userDispatch, dataDispatch, setPic){
         const response = await userExists.json()
         if(response){
           const user = response
-          console.log(user)
+          console.log(user.user)
           const data = response
           
           userDispatch({type: 'GET_USER', payload:  user.user})
@@ -60,5 +61,5 @@ export function useDataHook( userDispatch, dataDispatch, setPic){
     }
     callBackendAPI()
 
-  }, [])
+  }, [rgb])
 }

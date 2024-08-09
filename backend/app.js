@@ -87,7 +87,7 @@ app.post('/login',
   console.log('wtf why this not work')
   if(req.user) {
     console.log("user found")
-    next()
+    res.sendStatus(200)
     return;
   } else {
     console.log('user not logged in successfully')

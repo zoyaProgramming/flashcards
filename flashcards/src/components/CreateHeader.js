@@ -14,13 +14,10 @@ function ProfileIcon({userData, profile_pic}) {
   const isDark = useContext(DarkmodeContext)
   const c = profile_pic;
   return (
-        
-       <a className={"a__img-link" + isDark}href={userData.user.user_name}>
-        <img className={"img--profile-icon" + isDark} src={c} height={300} width={300}>
-        </img>
-        
-        </a>
-        
+    <a className={"a__img-link" + isDark}href={userData.user.user_name}>
+      <img className={"img--profile-icon" + isDark} src={c} height={300} width={300}>
+      </img>
+    </a>
   )
 }
 
@@ -28,14 +25,12 @@ function ProfileIcon({userData, profile_pic}) {
 function SearchBar(){
   const isDark = useContext(DarkmodeContext);
   const [searchResults, searchDispatch] = useReducer(searchReducer, {
-
   });
   const [input, setInput] = useState(null)
   
   return (
     <>
-      <Form method="get" action="/search/sets" style={{ display: 'flex', justifyContent: 'center', padding: '20px', width: '100%', minWidth: '0'}} 
-          >
+      <Form method="get" action="/search/sets" style={{ display: 'flex', justifyContent: 'center', padding: '20px', width: '100%', minWidth: '0'}} >
         <input placeholder="Search" name="term"className={"input--search " + isDark} onChange={(event) => setInput(event.target.value)}></input>
         <button type= "submit" className= {"material-symbols-outlined bttn--search" + isDark}>search</button>
       </Form>
