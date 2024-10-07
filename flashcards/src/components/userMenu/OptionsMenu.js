@@ -19,9 +19,8 @@ export default function OptionsMenu(){
   return(
     <div className={"div--options"}>
         <button className="bttn--navbar " onClick={() => {switchMode({darkMode: true})}}>default theme</button>
-        <button className="bttn--navbar" >private</button>
+        <button className="bttn--navbar" onClick={() => {switchMode({private: true})}} >private</button>
         <button className="bttn--navbar bttn--red" onClick = {()=> {
-          console.log('aaa')
           setConfirm(true)}}>Delete Account</button>
         
     </div>

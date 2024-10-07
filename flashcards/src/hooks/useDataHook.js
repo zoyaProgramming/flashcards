@@ -42,13 +42,8 @@ export function useDataHook( userDispatch, dataDispatch, setPic, rgb){
                   const url = URL.createObjectURL(Blob);
                   setPic(url)
                 }
-              //setPic(url)
             }
-            
-            
-
           }
-        
         } else {
           console.log('aaaa')
           userDispatch({type: 'CLEAR_USER'})

@@ -3,7 +3,6 @@ import { loginHandler } from "../../functions/serverEventHandlers"
 import { Form } from "react-router-dom"
 
 export  function LoginForm({setFormsOpen, userDispatch, setProfilePic, dataDispatch}) {
-  
     return(
       <div className="div--login-form">
         <h1>Login</h1>
@@ -13,7 +12,6 @@ export  function LoginForm({setFormsOpen, userDispatch, setProfilePic, dataDispa
           <label className= "form__label--login" htmlFor="password">password: </label>
           <input id="password" name="password"></input>
           <button className="form__bttn--submit--login" type="submit">submit</button>
-          
         </Form>
       </div>
     )

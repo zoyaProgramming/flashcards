@@ -6,6 +6,7 @@ const getUserById= dbFunctions.getUserById
 const express = require("express");
 const app = express();
 var bodyParser = require('body-parser')
+
 const session = require('express-session')
 require('dotenv').config()
 const middlewareWrapper = require('./cors/index.js');
@@ -54,7 +55,7 @@ passport.deserializeUser((id, done) => {
 
 app.use(function (req, res, next) {
   console.log('\n logging...')
-  console.log('%s %s %s %s \n', req.method, req.url, req.path)
+  console.log('%s %s %s %s \n', req.method, req.url, req.body)
   console.log(req.sessionID)
   next();
 })
@@ -78,13 +79,51 @@ passport.use(new LocalStrategy(function (username, password, cb) {
 }
 ));
 
+app.post('/signup', async (req, res, next) => {
+  const {username, password} = req.body;
+  try{
+    const userNameExists = await dbFunctions.checkUsername(username);
+    if(userNameExists) {
+      console.log('hiii')
+      dbFunctions.createUser({username: username, password: password}).then((value) => {
+        console.log('yippeeeee')
+        next();
+      },
+      (reason) =>{
+        res.status(500).json({msg: "Error creating user"})
+      });
+    } else {
+      console.log('woops')
+    }
+  } catch(err) {
+    console.log('aaaaa it exists')
+    console.log(err)
+    res.setHeader('Content-Type', 'text/plain')
+    res.status(400)
+    res.send("username already exists")
+    return;
+
+  }
+}, passport.authenticate('local'), (req, res, next) => {
+  if(req.user) {
+    console.log("user found")
+    res.sendStatus(200)
+    return;
+  } else {
+    console.log('user not logged in successfully')
+    res.sendStatus(404)
+    return;
+  }
+
+  });
 
 app.post('/login',
   passport.authenticate("local"), 
   (req, res, next) =>{
+    console.log('woops')
     console.log(res.getHeaderNames())
     console.log(req.sessionID)
-  console.log('wtf why this not work')
+    console.log('wtf why this not work')
   if(req.user) {
     console.log("user found")
     res.sendStatus(200)
@@ -97,8 +136,10 @@ app.post('/login',
 }, dataFunctions.fetchData)
 app.use('/', (req, res, next) => {
   if(!req.isAuthenticated()) {
+    console.log('user not authenticated')
     res.sendStatus(404)
   } else {
+    
     next()
   }
 })
@@ -112,6 +153,7 @@ app.get('/', (req, res, next) => {
     console.log(req.user)
     next()
   } else {
+    console.log('user not authorized')
     res.sendStatus(404)
   }
 }, dataFunctions.fetchData)

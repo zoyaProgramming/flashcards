@@ -13,6 +13,7 @@ import { userReducer } from './functions/userReducer.js';
 import { useDataHook } from './hooks/useDataHook.js';
 import { UserSidebar } from './components/userMenu/userSidebar.js';
 import { useLoaderData, useOutletContext, Outlet, useActionData} from 'react-router-dom';
+import HomePage from './components/homePage.js';
 const DataContext = createContext(null)
 const UserContext = createContext(null)
 const DarkmodeContext = createContext('')
@@ -107,9 +108,7 @@ function FlashcardSetListElement({ dispatchData, appState, index , dispatch}) {
   function updateSet() {
     if (newValue.front !== '' && newValue.back !== '') {
       submitUpdateHandler({ newCard: newValue, oldCard: flashcardSet[index], dispatchData: dispatchData}).then(() => {
-      }
-        
-      )
+      })
     }
     setEditInputState(!showEditInputState)
   }
@@ -338,7 +337,7 @@ function Flashcard({handleClick, nextCard, previousCard, appState, dispatch, dis
     );
 }
 
-export function C(){
+export function MainApp(){
   const [dispatch, dataDispatch, setIsDark, userDispatch] = useOutletContext();
   const state=useContext(StateContext)
   const data = useContext(DataContext)
@@ -347,7 +346,6 @@ export function C(){
   const isDark=useContext(DarkmodeContext)
   return(
     userState?//obviously don't want to load in the flashcard data if not logged in
-      
       <>
         <div className={"main-div" + isDark} tabIndex="0">
           <Flashcard isFront={state.isFront} appState={state} dispatch={dispatch}>
@@ -374,7 +372,7 @@ export function C(){
         </>
         :null}
     </>
-    : <p>not logged in???</p>
+    : <HomePage></HomePage>
   )
 }
 
@@ -434,20 +432,18 @@ function Body() {
       minWidth: '0'
     }}>
       
-      <UserContext.Provider value={userState.user}>
-        {sidebarOpen?<UserSidebar UserContext={UserContext} userDispatch={userDispatch} dataDispatch={dataDispatch} DarkmodeContext={DarkmodeContext} setIsDark={setIsDark}></UserSidebar>:null}
-      <DataContext.Provider value={data}>
+  <UserContext.Provider value={userState.user}>
+    {sidebarOpen?<UserSidebar UserContext={UserContext} userDispatch={userDispatch} dataDispatch={dataDispatch} DarkmodeContext={DarkmodeContext} setIsDark={setIsDark}></UserSidebar>:null}
+    <DataContext.Provider value={data}>
       <StateContext.Provider value={state}>
-      <div style={{maxHeight: '100vh', display: 'flex', flexDirection: 'column'}}>
-        <CreateHeader darkContext={DarkmodeContext} setProfilePic={setPic} profile_pic={profile_pic} userDispatch={userDispatch} dataDispatch={dataDispatch} userData={userState} data={data} setSidebarOpen = {setSidebarOpen} sidebarOpen={sidebarOpen} setDarkmode ={setIsDark}></CreateHeader>
-        <Outlet context={[dispatch, dataDispatch, setIsDark, userDispatch]}></Outlet>
-          
-          </div>
-        </StateContext.Provider>
-        </DataContext.Provider>
-        </UserContext.Provider>
-        
+        <div style={{maxHeight: '100vh', display: 'flex', flexDirection: 'column'}}>
+          <CreateHeader darkContext={DarkmodeContext} setProfilePic={setPic} profile_pic={profile_pic} userDispatch={userDispatch} dataDispatch={dataDispatch} userData={userState} data={data} setSidebarOpen = {setSidebarOpen} sidebarOpen={sidebarOpen} setDarkmode ={setIsDark}></CreateHeader>
+          <Outlet context={[dispatch, dataDispatch, setIsDark, userDispatch, state]}></Outlet>
         </div>
+        </StateContext.Provider>
+      </DataContext.Provider>
+    </UserContext.Provider>
+    </div>
         </DarkmodeContext.Provider>
     </>
     

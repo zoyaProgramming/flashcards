@@ -16,10 +16,7 @@ function SelectButton (props) {
   return(
     <tr key={Math.random()}className="tr--all-set-lis all-set-list"><td className="td--all-set-list all-set-list">
       <button className = "table--button" onClick={(event) => {
-        
         selectSetHandler(event, props.dataDispatch, props.elem.set_name).then(props.setIsOpen(false))
-        
-        
       }}>{props.elem.set_name}</button>
     </td></tr>
   )
@@ -99,7 +96,6 @@ export default function ViewSets(props) {
     return (
      
     <div className="div--center-overlapping">
-      
        <header className="header--list-flashcard-sets"> 
        <CloseButton setState={props.setIsOpen}></CloseButton>
         <h1 className="h1--list-flashcard-sets">All flashcard sets</h1>

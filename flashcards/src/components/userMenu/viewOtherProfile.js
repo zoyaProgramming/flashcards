@@ -21,7 +21,7 @@ function SetView({sets}) {
   const allSets = sets.map((object)=>{
     return(
       <>
-        <a className="link--set">{object.set_name}</a>
+        <a className="link--set" href={"sets/"+ object.name}>{object.name}</a>
         <p className="link--description">{object.description}</p>
       </>
     )
@@ -43,10 +43,6 @@ export function UserProfile({useParams}) {
   const user = loaded.user;
   const data = loaded.sets;
   //const [editProfilePicOpen, setEditProfilePicOpen] = useState(false)
-  
-
-    
-
   //const getData = useDataHook(userDispatch, dataDispatch, setPicSrc)
   var pp = null;
   if(!user) {
@@ -56,7 +52,6 @@ export function UserProfile({useParams}) {
   return (
     
     <div className="body--profile">
-  
       <img className="img--profile-icon" src={picSrc}style={{height: '100px', width: '100px', margin: 'auto', display: 'block', marginTop: '5vh'}}></img>
       
       <h1 className="h1--username roboto-regular" >{user.user_name}</h1>

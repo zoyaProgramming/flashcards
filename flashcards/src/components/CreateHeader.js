@@ -58,21 +58,16 @@ export default function CreateHeader({userDispatch, dataDispatch, userData, data
   }
   if(userData.user){
       return(
-        
       <DarkmodeContext.Provider value={isDark}>
         <div className={isDark}style={{display:'flex', alignItems:'center'}}>
           <button className={"menu--button material-symbols-outlined " + isDark} onClick={() => {setSidebarOpen(!sidebarOpen)}}>menu</button>
           <SearchBar></SearchBar>
         </div>
-      
         <span className ={isDark} >
-          
           <h1 className={"h1--navbar" + isDark}><a href="/">Flashcards</a></h1>
         </span>
         <header className={"header--navbar" + isDark}> 
-          
           <div className={"div--navbar" + isDark}style={{display: "flex", flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', columnGap: '3vw'}}>
-            
           <ProfileIcon userData = {userData} profile_pic={profile_pic}></ProfileIcon>
           
             <h1 className={"h1--header--username" + isDark}> {userData.user.user_name}</h1>
@@ -98,7 +93,6 @@ export default function CreateHeader({userDispatch, dataDispatch, userData, data
   } else if(userData.error) {
     return(
         <>
-
           <header className={"header--navbar" + isDark}>
             <div className={"div--navbar" + isDark}>
               <h1 className={"h1--navbar" + isDark} onClick={()=>{redirect('/balls')}}>Flashcards</h1>
@@ -121,9 +115,6 @@ export default function CreateHeader({userDispatch, dataDispatch, userData, data
   else {
     return(
       <> 
-      
-     
-      <h1>{userData.user}</h1>
         <header className={"header--navbar" + isDark}> 
           <div className={"div--navbar" + isDark}>
             <h1 className={"h1--navbar" + isDark}>Flashcards</h1>
@@ -131,8 +122,7 @@ export default function CreateHeader({userDispatch, dataDispatch, userData, data
             :null}
             {formsOpen.signup?<SignupForm setFormsOpen = {setFormsOpen} userDispatch={userDispatch} dataDispatch={dataDispatch} formsOpen={formsOpen}> </SignupForm>
             :null}
-           
-            <button className= {'bttn--navbar' + isDark} onClick={() => {setFormsOpen({login: !formsOpen.login, signup: false})}}>login</button>
+            <button className= {'bttn--navbar form__bttn--signup' + isDark} onClick={() => {setFormsOpen({login: !formsOpen.login, signup: false})}}>login</button>
             <button className = {' bttn--navbar form__bttn--signup' + isDark} onClick={()=>{setFormsOpen({signup: !formsOpen.signup, login: false})}}>sign up</button>
           </div>
         </header>

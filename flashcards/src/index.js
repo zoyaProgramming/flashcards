@@ -10,7 +10,8 @@ import './styles/login.css';
 import './styles/navbar.css';
 import './styles/searchMenu.css';
 import './styles/profile.css';
-import {App, C} from './App';
+import { ViewSet } from './components/userMenu/viewSet';
+import {App, MainApp} from './App';
 import reportWebVitals from './reportWebVitals';
 import {
   createBrowserRouter,
@@ -131,7 +132,7 @@ const router = createBrowserRouter([{
   errorElement: <ErrorElement></ErrorElement>,
   
   children: [
-    {path: '', element: (<C></C>)},
+    {path: '', element: (<MainApp></MainApp>)},
     {
       path: '/login',
       action: async function ({request}) {
@@ -266,6 +267,27 @@ const router = createBrowserRouter([{
       element:<SearchResults></SearchResults>
     }, {
       path: 'users/:user',
+      loader:  async function ({params}){
+        console.log(params)
+        const searchTerm = params.user;
+        console.log(searchTerm)
+        const body = {
+          type: 'user',
+          set: searchTerm
+        }
+        const result = await fetch('http://localhost:3500/users/' + searchTerm,{method: 'get', credentials: 'include'
+        })
+        if(!result.ok){
+          console.log('one less problem without you')
+          return null;
+        } else {
+          console.log('yeah were so back')
+          const jsonResult = await result.json()
+          console.log(jsonResult)
+          return jsonResult;
+        }
+        return null;
+      },
       children: [
         {
           path: 'profile',
@@ -293,15 +315,45 @@ const router = createBrowserRouter([{
           element: <UserProfile></UserProfile>,
           children: [{
             
-          }
-
+          }, 
           ]
-        }
+        },
+        {
+          path: 'sets',
+          children: 
+          [
+            {
+              path: ':set_name',
+              loader:  async function ({params}){
+                console.log(params)
+                const searchTerm = params.user;
+                console.log(searchTerm)
+                const body = {
+                  type: 'user',
+                  set: searchTerm
+                }
+                const result = await fetch('http://localhost:3500/users/' + searchTerm,{method: 'get', credentials: 'include'
+                })
+                if(!result.ok){
+                  console.log('one less problem without you')
+                  return null;
+                } else {
+                  console.log('yeah were so back')
+                  const jsonResult = await result.json()
+                  console.log(jsonResult)
+                  return jsonResult;
+                }
+                return null;
+              },
+              element: (<ViewSet/>)
+            }
+          ]
+        },
 
       ]
       
 
-    },
+    }
   ]
 }]
   

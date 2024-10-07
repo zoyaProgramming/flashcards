@@ -41,9 +41,6 @@ function usePic(test, setPic) {
 function ProfileIcon({userData, profile_pic, isDark}) {
   const [src, setPic] = useState(null);
   const pp = usePic(userData.data, setPic);
- 
-
-
   const c = profile_pic;
   return (
         <img className="img--profile-icon-search-results " src={src} height={50} width={50}>
@@ -62,42 +59,27 @@ export default function SearchResults({results}) {
   if(test){
 
     let resultsMapped=[]
+    //show the users:
     if(selected==0 && Array.isArray(test.users)) {
        resultsMapped = test.users.map((value)=> {
-        if(value.user_name){
-          return(
-            <li className="li--user">
-              <ProfileIcon userData={value}></ProfileIcon>
-                <a className="link " href={"/users/" + value.user_name +'/profile'}>{value.user_name}</a>
-            </li>
-          )
-        } else {
-          return(
-                <li className="li--link-sidebar">
-                  <a className={"link "}href={"/users/" + value.user_id + "/sets" + value.set_name}>{value.set_name}</a>
-                  <button className={"material-symbols-outlined button--add "}>add</button>
-                </li>
-          )
-        }
+        <p></p>
+        return(
+          <li className="li--user">
+            <ProfileIcon userData={value}></ProfileIcon>
+              <a className="link " href={"/users/" + value.user_name +'/profile'}>{value.user_name}</a>
+          </li>
+        )
       })
-    } else if (selected==1 && Array.isArray(test.sets)){
+    }// show the search result sets  
+    else if (selected==1 && Array.isArray(test.sets)){
       resultsMapped = test.sets.map((value)=> {
-        if(value.user_name){
-          return(
-            <li className="li--search-results">
-                <a className="link " href={"/users/" + value.user_name +'/profile'}>{value.user_name}</a>
-              </li>
-          )
-        } else {
-          return(
-                
-                <li className="li--search-results">
-                  
-                  <a className="link "href={"/users/" + value.user_id + "/sets" + value.set_name}>{value.set_name}</a>
-                  <button className={"material-symbols-outlined button--add "}>add</button>
-                </li>
-          )
-        }
+        return(
+          <li className="li--search-results">
+            <p className={"link "}>{JSON.stringify(value)}</p>
+            <a className="link "href={"/users/" + value.user_name + "/sets/" + value.set_name}>{value.set_name}</a>
+            <button className={"material-symbols-outlined button--add "}>add</button>
+          </li>
+        )
       })
 
     }

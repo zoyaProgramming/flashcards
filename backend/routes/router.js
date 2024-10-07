@@ -40,29 +40,7 @@ const checkForValidInput = dataController.checkForValidInput;
 
 router.post('/profilepic', dataController.uploadProfilePic, dataController.fetchData)
 router.get('/profilepic', dataController.loadPic)
-router.post('/signup', async (req, res, next) => {
-  const {user, password} = req.body;
-  try{
-    const userNameExists = await userController.checkUsername(user);
-    if(userNameExists) {
-      console.log('hiii')
-      userController.createUser({username: user, password: password}).then((value) => {
-        res.status(200).json({msg: "User successfully created!", 
-          username: value.username
-        })
-      },
-      (reason) =>{
-        res.status(500).json({msg: "Error creating user"})
-      });
-    }
-  } catch(err) {
-    res.setHeader('Content-Type', 'text/plain')
-    res.status(400)
-    res.send("username already exists")
-    return;
 
-  }
-})
 router.post('/logout', (req, res) => {
   req.logout(null, (err) => {
     if(err){
@@ -84,7 +62,7 @@ router.get('/listSets', sets) // shouldn't be used anymore
 router.get('/:fetchId', (req, res, next) => {
   console.log('re')
 })
-router.post('/delete', deleteFunction, fetchFunction)
+router.post('/deletecard', deleteFunction, fetchFunction)
 
 router.post('/updateDescription', userController.updateDescription, fetchFunction)
 //router.use('/:fetchId', getTblName)

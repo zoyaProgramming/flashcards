@@ -300,13 +300,6 @@ exports.selectSet = function(req, res, next)
 // just because im lazy
 function setDefaultProfilePic(req, binaryString, fileOriginal) {
   const r = new File([binaryString], 'defaultpic.png',{type: 'image/png'})
-  console.log('Clone: ')
-  console.log(r)
-  console.log('Original: ')
-  
-  
-  
-  console.log('idsajf0sjdiofjfdisoj')
 /*  function base64ToUint8Array(binaryString) {
     const len = binaryString.length;
     const bytes = new Uint8Array(len);
@@ -324,7 +317,6 @@ function setDefaultProfilePic(req, binaryString, fileOriginal) {
   return new Promise( async function (resolve, reject){
     const buffer = await r.arrayBuffer()
     const uint8array = new Uint8Array(buffer)
-    console.log(uint8array)
     db.run('INSERT OR REPLACE INTO profile_pic(data, user_id) VALUES (?,?);', [uint8array, req.user.id], (err) => {
       if(!err) {
         console.log('success creating profile pic')
@@ -333,7 +325,6 @@ function setDefaultProfilePic(req, binaryString, fileOriginal) {
       
           } else {
             console.log('not error')
-            console.log(response)
           }
         })
         resolve()
@@ -354,7 +345,6 @@ exports.fetchData = function(req, res, next) {
   
   function callback() {
     if(set === undefined) {
-    console.log('err')
     try{
       
       db.all(`SELECT set_name, description from flashcard_set WHERE user_id= ?;`, [req.user.id], (err, response) => {
@@ -386,7 +376,6 @@ exports.fetchData = function(req, res, next) {
           return;
         }
         else if(rows == null) {
-          console.log("null bitch")
           res.status()
           res.setHeader('Content-Type', 'application/json')
           res.send(JSON.stringify(
@@ -416,15 +405,11 @@ exports.loadPic = async function(req, res, next) {
       req.session.profilePic = null;
       callback()
     } else if (Array.isArray(response) && response.length > 0) {
-      console.log(req.user.id)
-      console.log("response" + typeof response)
-      console.log(response)
       const b = response[response.length -1].data;
       const uint16array = new Uint16Array(
         b.buffer,
         b.byteOffset,
         b.length / Uint16Array.BYTES_PER_ELEMENT);
-        console.log(response[response.length-1].data)
       res.send(response[response.length-1].data)
     } else {
       console.log('this user doesnt have a profile pic yet')
@@ -437,7 +422,6 @@ exports.loadPic = async function(req, res, next) {
               req.session.profilePic = null;
               callback()
             } else if (response) {
-              console.log(req.user.id)
               const b = response[response.length -1].data;
               const uint16array = new Uint16Array(
                 b.buffer,
@@ -459,7 +443,6 @@ exports.loadPic = async function(req, res, next) {
 exports.delete = function(req, res, next) { // delete a flashcard
   console.log('trying to delete a flashcard with info: ' + req.body)
   let set = req.tablename;
-  console.log(set)
   const front = req.body.front;
   const back = req.body.back;
   const sql = `DELETE FROM flashcard WHERE (front="${front}" AND back="${back}" AND user_id= ? AND set_id= ?);`;
@@ -791,10 +774,36 @@ exports.search = function(req, res, next) {
   const param = `%${term}%`
   console.log('aaaaa')
   console.log(param)
-  
   const users = new Promise((resolve, reject) => {
       const c = [];
-      db.all('SELECT DISTINCT user_name, id FROM user WHERE user_name LIKE ? LIMIT 20;', [param], (err, result)=>{
+      const sql2 = 'SELECT user_name, id, private, \
+      (SELECT data FROM profile_pic WHERE profile_pic.user_id = user.id) AS data \
+      FROM user WHERE user_name LIKE ? AND private=0;'
+      db.all(sql2, [param], (err, result) => {
+        if(err){
+          console.log(err)
+          res.sendStatus(500)
+        } else if(Array.isArray(result)) {
+          if(err){
+            res.sendStatus(404);
+          }
+          result.forEach((row, index)=>{
+            if (row.data !== undefined){
+              const picData = row.data;
+                const uint16array = new Uint16Array(
+                  picData.buffer,
+                  picData.byteOffset,
+                  picData.length / Uint16Array.BYTES_PER_ELEMENT);
+                result[index].data = (picData!== undefined?picData.toString('base64'):null);
+            } else {
+              result[index].data = null;
+            }
+          });
+          resolve(result);
+
+        }
+      })
+      /*db.all('SELECT DISTINCT user_name, id FROM user WHERE user_name LIKE ? AND private=0 LIMIT 20;', [param], (err, result)=>{
         if(err){
           console.log(err)
           res.sendStatus(500)
@@ -803,6 +812,7 @@ exports.search = function(req, res, next) {
           result.forEach((row, index) => {
             console.log('HELP ME')
             const pp = new Promise((resolve1, reject) => {
+              // 
               db.get('SELECT user_id, data FROM profile_pic WHERE user_id=?', [row.id], (err, result1) => {
                 if(err){
                   console.log('please')
@@ -814,9 +824,6 @@ exports.search = function(req, res, next) {
                     b.byteOffset,
                     b.length / Uint16Array.BYTES_PER_ELEMENT);
                   result[index].data = (result1!== undefined?b.toString('base64'):null);
-                  console.log()
-                  console.log(Buffer.isBuffer(result[index].data))
-                  console.log(result[index].data.buffer)
                   resolve1(result1)
 
                 } else {
@@ -836,33 +843,31 @@ exports.search = function(req, res, next) {
           }, (error) => {
             console.log('error' + error)
           })
-
         }
-      })
+      });*/
   })
   const data = new Promise((resolve, reject) => {
-    db.all('SELECT DISTINCT set_name FROM flashcard_set WHERE set_name LIKE ? LIMIT 20;',[param], (err, result)=>{
+    db.all('SELECT DISTINCT set_name, user_id,\
+      (SELECT user_name FROM user WHERE user.id = flashcard_set.user_id) AS user_name\
+      FROM  \
+      flashcard_set WHERE set_name LIKE ? \
+      AND user_id IN (SELECT user_id FROM user WHERE private=0)\
+      LIMIT 200;'
+      ,[param], (err, result)=>{
       if(err){
         console.log(err)
         res.sendStatus(500)
       } else if(Array.isArray(result)) {
-        console.log(result)
-        
-          resolve(result)
+        resolve(result)
       }
     })
   })
 
   Promise.all([users, data]).then((result) => {
     if(result){
-      console.log('good grief')
       res.send({users: result[0], sets: result[1], term: term})
-      
     }
   })
-      
-
-    
 }
 
 
@@ -873,13 +878,15 @@ exports.fetchDataFromOtherUser = async function(req, res, next) {
     db.get('SELECT user_name, id, profile_description from user WHERE user_name=?',[req.params.user], (err, response) => {
       if(err){
         console.log('error')
-        reject(null);
+        console.log(err)
+        console.log('selecting ')
         res.sendStatus(500)
         
       } else if(response){
         resolve(response);
       } else {
         console.log('error')
+        console.log('null response')
         reject(null)
         res.sendStatus(500)
       }
@@ -890,7 +897,6 @@ exports.fetchDataFromOtherUser = async function(req, res, next) {
     console.log('error')
     return;
   }
-  
     try{
       console.log('how u diogn')
       const userData = {
@@ -898,46 +904,65 @@ exports.fetchDataFromOtherUser = async function(req, res, next) {
         user:user
       }
 
-    db.all(`SELECT set_name, description, id from flashcard_set WHERE user_id= ?;`, [user.id], (err, response) => {
+      db.all(`SELECT set_name, description, id from flashcard_set WHERE user_id= ?;`, [user.id], (err, response) => {
         if(err) {
+          console.log(err)
           console.log('error')
           res.status(500);
           res.setHeader('Content-Type', 'text/plain')
           res.send(err)
         } else {
           console.log('good hbu')
+          const promises = []
           response.forEach((row, index)=> {
             userData.sets[index] = {name: row.set_name, description: row.description, id: row.id, cards :[]}
-            db.all(`SELECT front, back from flashcard WHERE set_id= ? AND user_id= ?;`, [row.id, user], (err, rows) => {
-              if(err) {
-                console.log('error')
-                console.log('error getting rows')
-                console.log(err)
-                res.status(500)
-                res.setHeader('Content-Type', 'text/plain')
-                res.send(err)
-                return;
-              }
-              else if(rows == null) {
-                console.log('error')
-                userData.sets[index].cards=[...rows];
-                return;
-              }
-              if (Array.isArray(userData.sets[index])&&userData.sets[index].length == 0){
-                console.log('null bitch')
-              }
-              console.log('no prob')
-              
-            })
+              const x =  new Promise((resolve1, reject1) => {
+                db.all(`SELECT front, back from flashcard WHERE set_id= ? AND user_id= ?;`, [row.id, user.id], (err, rows) => {
+                  if(err) {
+                    console.log('error')
+                    console.log('error getting rows')
+                    console.log(err)
+                    res.status(500)
+                    res.setHeader('Content-Type', 'text/plain')
+                    res.send(err)
+                    reject1()
+                    return;
+                  }
+                  else if(rows == null || Array.isArray(rows) && rows.length==0) {
+                    console.log('error')
+
+                    resolve1([])
+                    console.log(promises)
+                    return;
+                  }
+                  if (Array.isArray(userData.sets[index])&&userData.sets[index].length == 0){
+                    console.log('null bitch')
+                  }
+                  userData.sets[index].cards=[...rows];
+                  resolve1(userData.sets[index].cards)
+                  console.log(promises);
+                  
+                })
+              });
+              promises[index] = x;
+            }
+          )
+          console.log('good')
+          console.log(promises)
+          Promise.all(promises).then( (result) => {
+            console.log('yee')
+            if(Array.isArray(response) && response.length===0){
+              console.log('null')
+              userData.sets = null;
+              res.send(JSON.stringify(userData))
+            } else {
+              console.log('aaaa')
+              console.log(userData)
+              res.send(JSON.stringify(userData))
+            }
           })
           
-          if(Array.isArray(response) && response.length===0){
-            console.log('null')
-            userData.sets = null;
-            res.send(JSON.stringify(userData))
-          } else {
-            res.send(JSON.stringify(userData))
-          }
+          
         }
       })
     

@@ -79,7 +79,7 @@ export  function deleteHandler(flashcard, dataDispatch)
  {
   dataDispatch({type: 'LOADING_DATA', payload: null})
   async function callBackendAPI() {
-    const response = await fetch('http://localhost:3500/delete', {
+    const response = await fetch('http://localhost:3500/deletecard', {
       method: 'post',
       headers: {
         'Content-Type' : 'application/json'
@@ -115,7 +115,7 @@ export async function signupHandler(event, userDispatch) {
     },
     credentials: 'include',
     body: JSON.stringify({
-      user: user,
+      username: user,
       password: pass
     })
   })
@@ -188,7 +188,7 @@ export async function loginHandler(event, userDispatch, profile_pic, dataDispatc
 
 
 }
-
+// duhhh
 export async function addSetHandler(event, dataDispatch){
   const data = new FormData(event.target)
   const name = data.get('name');
@@ -354,8 +354,78 @@ export async function switchMode(options){
     body: JSON.stringify(options)
   })
   if(!result.ok){
-    console.log('success chaning options')
+    console.log('not success chaning options')
   }
+}
+
+
+export async function duplicateSet(name, description, dataDispatch, userDispatch, cards){
+  console.log('adding');
+  let result;
+  dataDispatch({
+    type: 'LOADING_DATA',
+    payload: null
+  })
+  const request = await fetch("http://localhost:3500/createSet", {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include',
+    body: JSON.stringify({
+      name, description
+    })
+  })
+  if(request.ok) {
+      result = await request.json()
+      dataDispatch({
+        type: 'GET_DATA',
+        payload: result
+      })
+
+      if(result.ok){
+        for(const newCard in cards){
+          dataDispatch({type: 'LOADING_DATA', payload: null})
+          console.log('submit add handler')
+          async function callBackendAPI(){
+            try {
+              const response = await fetch("http://localhost:3500/save", {
+                method: 'post',
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                credentials: 'include',
+    
+                body: JSON.stringify({
+                  front: sanitize(newCard.front),
+                  back: sanitize(newCard.back)
+                })}
+              );
+              if (!response.ok) {
+                const msg = await response.text()
+                dataDispatch({type: 'DATA_ERROR', payload: msg})
+                
+              } else {
+                const json = await response.json()
+                dataDispatch({type: 'GET_DATA', payload: json})
+              }
+            } catch (error) {
+              console.error(error.message);
+            }
+          };
+        callBackendAPI();
+        }
+      }
+
+  } else{
+      console.log('one less problem without u')
+      const msg = await request.text()
+      dataDispatch({
+        type: 'DATA_ERROR',
+        payload: msg
+      })
+  }
+  
 }
 
 
